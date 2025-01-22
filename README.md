@@ -26,7 +26,7 @@ OpenTag aims to standardize the following:
 * [Previous Considerations](#previous-considerations)
     
 # Backers
-These are companies that are implementing Open 3D-RFID into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
+These are companies that are implementing OpenTag into their printers, filament, add-ons, etc.  If you would like to join this list, please open an Issue on GitHub.
 * Filament Manufacturers (Sorted by date backed):
   * [Polar Filament](https://polarfilament.com)
   * [3D Fuel](https://www.3dfuel.com/)
