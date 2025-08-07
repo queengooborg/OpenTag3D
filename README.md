@@ -164,7 +164,7 @@ We should do our best to remain within memory address, which has a max address o
 | Volumetric Speed Min (×10 mm³/s) | Int        | 0xC8          | 1            | Operational  | `20`                           | Min speed recommendation.                                                                      |
 | Volumetric Speed Max (×10 mm³/s) | Int        | 0xC9          | 1            | Operational  | `120`                          | Max safe speed.                                                                                |
 | Volumetric Speed Recommended     | Int        | 0xCA          | 1            | Operational  | `80`                           | Default recommended speed.                                                                     |
-| RESERVED                         | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                                                       |
+| RESERVED                         | —          | 0xCB–0x1F8    | —            | —            | —                              | Reserved for future use.                                                                       |
 
 ### Web API Standard
 
