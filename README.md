@@ -39,16 +39,16 @@ OpenTag aims to standardize the following:
 
 These are companies that are implementing OpenTag into their printers, filament, add-ons, etc. If you would like to join this list, please open an Issue on GitHub.
 
-- Filament Manufacturers (Sorted by date backed):
-  - [Polar Filament](https://polarfilament.com) (2024-02-25)
-  - [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com) (2024-09-20)
-  - [3D Fuel](https://www.3dfuel.com/) (2024-10-30)
-  - [Numakers](https://numakers.com/) (2024-11-24)
-  - [American Filament](https://americanfilament.us) (2025-01-20)
+- Filament Manufacturers:
+  - [Polar Filament](https://polarfilament.com) (Backed 2024-02-25)
+  - [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com) (Backed 2024-09-20)
+  - [3D Fuel](https://www.3dfuel.com/) (Backed 2024-10-30)
+  - [Numakers](https://numakers.com/) (Backed 2024-11-24)
+  - [American Filament](https://americanfilament.us) (Backed 2025-01-20)
 - Printers + Hardware:
-  - [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool)) (2024-10-23)
-  - [Cosmyx](https://www.cosmyx3d.com/) (2024-10-30)
-  - [Distrifab](https://distrifab.fr/) (2024-10-30)
+  - [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool)) (Backed 2024-10-23)
+  - [Cosmyx](https://www.cosmyx3d.com/) (Backed 2024-10-30)
+  - [Distrifab](https://distrifab.fr/) (Backed 2024-10-30)
 
 # Why RFID?
 
