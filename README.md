@@ -98,7 +98,9 @@ NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab 
 - Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG216 tags as well
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
-If a filament manufacturer wishes to only implement the core data for their spools, then the NTAG213 (144-byte) tags are a valid alternative. In the current version of the specification, NTAG215 (540-byte) tags are also compatible.
+If a filament manufacturer wishes to only implement the core data for their spools, then the NTAG213 (144-byte) tags are a valid alternative.
+
+In the current version of the specification, NTAG215 (540-byte) tags are also compatible, but is just underneath the amount of bytes reserved for future use.
 
 ## Mechanical Standard
 
@@ -166,7 +168,7 @@ We should do our best to remain within memory address, which has a max address o
 | Volumetric Speed Min (×10 mm³/s) | Int        | 0xC8          | 1            | Operational  | `20`                           | Min speed recommendation.                                                                      |
 | Volumetric Speed Max (×10 mm³/s) | Int        | 0xC9          | 1            | Operational  | `120`                          | Max safe speed.                                                                                |
 | Volumetric Speed Recommended     | Int        | 0xCA          | 1            | Operational  | `80`                           | Default recommended speed.                                                                     |
-| RESERVED                         | —          | 0xCB–0x1F8    | —            | —            | —                              | Reserved for future use.                                                                       |
+| RESERVED                         | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                                                       |
 
 ### Web API Standard
 
