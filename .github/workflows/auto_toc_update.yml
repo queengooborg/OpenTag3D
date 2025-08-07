@@ -1,0 +1,28 @@
+name: auto-toc-update
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "**.md"
+      - "**.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          curl https://raw.githubusercontent.com/ekalinin/github-markdown-toc/master/gh-md-toc -o gh-md-toc
+          chmod a+x gh-md-toc
+          for file in "**/*.md"; do
+            ./gh-md-toc --insert --no-backup --hide-footer --skip-header $file
+          done
+          rm gh-md-toc
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Auto update markdown TOC
