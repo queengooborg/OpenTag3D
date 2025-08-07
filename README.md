@@ -91,10 +91,12 @@ NFC NTAG216: 13.56 MHz 888-byte tags
 
 NTAG216 tags are cheap and common. They allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
 
-NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu AMS uses, for the following reasons:
+NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
 
 - More memory (NTAG216: 888-bytes usable, MF1K: 768-bytes usable)
 - Smartphone Support: NTAG216 can be read from smartphones, while MF1K requires a dedicated reader
+- Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG216 tags as well
+- Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
 ## Mechanical Standard
 
