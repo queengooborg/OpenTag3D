@@ -35,6 +35,12 @@ OpenTag aims to standardize the following:
 
 <!-- prettier-ignore-end -->
 
+# History
+
+The OpenTag protocol, initially called "Open 3D-RFID", was originally incubated by the Bambu Research Group, a group dedicated to researching and reverse engineering the tag data from Bambu Lab's RFID tags. When the RFID tags were launched with Bambu Lab spools using a proprietary, encrypted format, the group knew that it was only a matter of time before other brands released their own proprietary formats.
+
+As the OpenTag protocol began to reach maturity, it was later moved to its own repository, where it continues to incubate to this day.
+
 # Backers
 
 These are companies that are implementing OpenTag into their printers, filament, add-ons, etc. If you would like to join this list, please open an Issue on GitHub.
