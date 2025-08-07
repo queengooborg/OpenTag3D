@@ -15,11 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Update TOC
       - uses: actions/checkout@v3
       - run: |
           curl https://raw.githubusercontent.com/ekalinin/github-markdown-toc/master/gh-md-toc -o gh-md-toc
           chmod a+x gh-md-toc
-          for file in "**/*.md"; do
+          for file in $(find . -type f -name "*.md"); do
             ./gh-md-toc --insert --no-backup --hide-footer --skip-header $file
           done
           rm gh-md-toc
