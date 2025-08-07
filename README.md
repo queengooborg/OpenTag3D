@@ -98,6 +98,8 @@ NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab 
 - Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG216 tags as well
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
+If a filament manufacturer wishes to only implement the core data for their spools, then the NTAG213 (144-byte) tags are a valid alternative. In the current version of the specification, NTAG215 (540-byte) tags are also compatible.
+
 ## Mechanical Standard
 
 - Tag placement: The center should be 56.0mm away from the center of the spool (see pic)
