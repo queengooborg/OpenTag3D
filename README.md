@@ -106,7 +106,9 @@ In the current version of the specification, NTAG215 (540-byte) tags are also co
 
 ## Mechanical Standard
 
-- Tag placement: The center should be 56.0mm away from the center of the spool (see pic)
+The NFC tags should be placed on the spools as follows:
+
+- The center should be 56.0mm away from the center of the spool (see pic)
 - The tag should never be more than 4.0mm away from the external surface of the spool
   - For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
 - Two tags should be used, one on each end of the spool, directly across from each other
