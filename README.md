@@ -1,5 +1,7 @@
 # OpenTag3D: Open Source Filament RFID Standard
 
+_Current Version: 0.001_
+
 RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest.
 OpenTag strives to be a standard that allows RFID tags to work across 3D Printer Brands, Filament Brands, and Accessory Brands.
 
