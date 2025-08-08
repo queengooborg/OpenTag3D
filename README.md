@@ -209,10 +209,12 @@ Non-voting members are integral to the consortium's ecosystem, contributing idea
 
 These are topics that are commonly brought up when learning about OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
-- NTAG216 vs MIFARE:
-  - NTAG216 is compatible with smartphones and has slightly more usable memory than MIFARE tags
+- NTAG vs MIFARE
+  - NTAG213/215/216 is compatible with smartphones
+  - NTAG216 has slightly more usable memory than MIFARE tags
   - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
-- JSON vs Memory Map:
+  - The hardware used for reading MIFARE tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
+- JSON vs Memory Map
   - Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped. For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
   - NTAG216 tags only have 888 bytes of usable memory, which would be eaten up quickly
 - Lookup Tables
