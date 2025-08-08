@@ -95,7 +95,7 @@ The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. T
 | NTAG215  | 504 bytes | Core + Extended |
 | NTAG216  | 888 bytes | Core + Extended |
 
-<img src="./images/mifareclassicsticker.jpg" width="200">
+<img src="./images/ntag-sticker.jpg" width="200">
 
 NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
 
