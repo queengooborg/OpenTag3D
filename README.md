@@ -1,9 +1,9 @@
-# OpenTag: Open Source RFID Standard
+# OpenTag3D: Open Source Filament RFID Standard
 
 RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest.
 OpenTag strives to be a standard that allows RFID tags to work across 3D Printer Brands, Filament Brands, and Accessory Brands.
 
-OpenTag aims to standardize the following:
+OpenTag3D aims to standardize the following:
 
 - **Hardware** - The specific underlying RFID technology
 - **Mechanical Requirements** - Positioning of tag on the spool
@@ -20,14 +20,14 @@ OpenTag aims to standardize the following:
 * [Backers](#backers)
 * [Why RFID?](#why-rfid)
 * [Add RFID support to your printer](#add-rfid-support-to-your-printer)
-* [OpenTag Standards](#opentag-standards)
+* [OpenTag3D Standards](#opentag3d-standards)
    * [Hardware Standard](#hardware-standard)
    * [Mechanical Standard](#mechanical-standard)
    * [Data Structure Standard](#data-structure-standard)
-      * [Memory Map - Open Tag Lite](#memory-map---open-tag-lite)
+      * [Memory Map - OpenTag3D Lite](#memory-map---opentag3d-lite)
       * [Memory Map - Extended Data](#memory-map---extended-data)
       * [Web API Standard](#web-api-standard)
-   * [OpenTag Consortium](#opentag-consortium)
+   * [OpenTag3D Consortium](#opentag3d-consortium)
       * [Voting Members](#voting-members)
       * [Non-Voting Members](#non-voting-members)
    * [Previous Considerations](#previous-considerations)
@@ -37,13 +37,13 @@ OpenTag aims to standardize the following:
 
 # History
 
-The OpenTag protocol, initially called "Open 3D-RFID", was originally incubated by the Bambu Research Group, a group dedicated to researching and reverse engineering the tag data from Bambu Lab's RFID tags. When the RFID tags were launched with Bambu Lab spools using a proprietary, encrypted format, the group knew that it was only a matter of time before other brands released their own proprietary formats.
+The OpenTag3D protocol, initially called "Open 3D-RFID", was originally incubated by the Bambu Research Group, a group dedicated to researching and reverse engineering the tag data from Bambu Lab's RFID tags. When the RFID tags were launched with Bambu Lab spools using a proprietary, encrypted format, the group knew that it was only a matter of time before other brands released their own proprietary formats.
 
-As the OpenTag protocol began to reach maturity, it was later moved to its own repository, where it continues to incubate to this day.
+As the OpenTag3D protocol began to reach maturity, it was later moved to its own repository, where it continues to incubate to this day.
 
 # Backers
 
-These are companies that are implementing OpenTag into their printers, filament, add-ons, etc. If you would like to join this list, please open an Issue on GitHub.
+These are companies that are implementing OpenTag3D into their printers, filament, add-ons, etc. If you would like to join this list, please open an Issue on GitHub.
 
 - Filament Manufacturers:
   - [Polar Filament](https://polarfilament.com) (Backed 2024-02-25)
@@ -81,7 +81,7 @@ RFID support can theoretically be added to any printer using off-the-shelf RFID 
 
 Did you make a design to add RFID to your printer? Let us know so we can link to it here! Designs can be 3D models, or firmware.
 
-# OpenTag Standards
+# OpenTag3D Standards
 
 ## Hardware Standard
 
@@ -117,7 +117,7 @@ This is a list of data that will live on the RFID chip, separated into required 
 
 NTAG216 tags have 888 bytes of usable memory.
 
-### Memory Map - Open Tag Lite
+### Memory Map - OpenTag3D Lite
 
 This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
 All strings are UTF-8 unless specified otherwise.
@@ -125,7 +125,7 @@ All integers are unsigned, big endian, unless specified otherwise.
 
 | Field                   | Data Type      | Start Address | Size (bytes) | Usage        | Example                           | Description                                                                                                                                                                                     |
 | ----------------------- | -------------- | ------------- | ------------ | ------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tag Format              | String         | 0x10          | 2            | Operational  | `OT`                              | This is always "OT" for "Open Tag", this helps differentiate between the OpenTag and other formats. If a tag doesn't start with "OT", it is not OpenTag format.                                 |
+| Tag Format              | String         | 0x10          | 2            | Operational  | `OT`                              | This is always "OT", this helps differentiate between the OpenTag3D and other formats. If a tag doesn't start with "OT", it is not OpenTag3D format.                                            |
 | Tag Version             | Int            | 0x12          | 2            | Operational  | `1234`                            | RFID tag data format version to allow future compatibility in the event that the data format changes dramatically. Stored as an int with 3 implied decimal points. Eg `1000` → version `1.000`. |
 | Filament Manufacturer   | String         | 0x14          | 16           | Display-only | `"Polar Filament"`                | String representation of filament manufacturer. 16 bytes is the max data length per block. Longer names will be abbreviated or truncated.                                                       |
 | Base Material Name      | String         | 0x24          | 5            | Display-only | `"PLA"`, `"PETG"`, `"PCTFE"`      | Material name in plain text, excluding any modifiers.                                                                                                                                           |
@@ -177,15 +177,15 @@ Some tags can contain extended data that doesn't fit or doesn't belong on the RF
 These complex variables can be looked up using the "web API" URL that is stored on the RFID tag.
 
 The format of this data should be JSON.
-The exact contents of this data are still open to discussion, and it is not required to launch the OpenTag standard. The web API can be implemented in the future without affecting the launch of OpenTag.
+The exact contents of this data are still open to discussion, and it is not required to launch the OpenTag3D standard. The web API can be implemented in the future without affecting the launch of OpenTag3D.
 
-## OpenTag Consortium
+## OpenTag3D Consortium
 
-The OpenTag Consortium is a collaborative group of 3D printing companies, hobbyists, RFID experts, and other stakeholders committed to maintaining and evolving the OpenTag RFID standard specification. The consortium operates under a structured membership model, ensuring a balance of inclusivity and effective decision-making.
+The OpenTag3D Consortium is a collaborative group of 3D printing companies, hobbyists, RFID experts, and other stakeholders committed to maintaining and evolving the OpenTag3D RFID standard specification. The consortium operates under a structured membership model, ensuring a balance of inclusivity and effective decision-making.
 
 ### Voting Members
 
-Voting members play a critical role in the governance of the OpenTag standard. They have the authority to vote on proposals related to modifying the specification. Their decisions shape the future direction of OpenTag, ensuring it meets the needs of the community and industry.
+Voting members play a critical role in the governance of the OpenTag3D standard. They have the authority to vote on proposals related to modifying the specification. Their decisions shape the future direction of OpenTag3D, ensuring it meets the needs of the community and industry.
 
 To maintain fairness and inclusivity, the voting seats are divided equally between:
 
@@ -204,17 +204,17 @@ Non-voting members are integral to the consortium's ecosystem, contributing idea
 
 ## Previous Considerations
 
-These are topics that are commonly brought up when learning about OpenTag. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
+These are topics that are commonly brought up when learning about OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
 - NTAG216 vs MIFARE:
   - NTAG216 is compatible with smartphones and has slightly more usable memory than MIFARE tags
-  - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag because of the open-source nature
+  - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
 - JSON vs Memory Map:
   - Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped. For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
   - NTAG216 tags only have 888 bytes of usable memory, which would be eaten up quickly
 - Lookup Tables
-  - OpenTag does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
+  - OpenTag3D does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
   - Lookup tables can quickly become outdated, which would require regular updates to tag readers to make sure they've downloaded the most recent table.
   - Storing lookup tables consumes more memory on the device that reads tags
-  - On-demand lookup (via the internet) would require someone to host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag format in the hands of a single person/company
+  - On-demand lookup (via the internet) would require someone to host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag3D format in the hands of a single person/company
   - Rather than representing data as a number (such as "company #123 = Example Company), the plain-text company name should be used instead
