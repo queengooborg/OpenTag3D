@@ -87,22 +87,23 @@ Did you make a design to add RFID to your printer? Let us know so we can link to
 
 ## Hardware Standard
 
-NFC NTAG216: 13.56 MHz 888-byte tags
+The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
+
+| Tag Type | Capacity  | Compatibility           |
+| -------- | --------- | ----------------------- |
+| NTAG213  | 144 bytes | OpenTag Lite            |
+| NTAG215  | 504 bytes | OpenTag Lite + Extended |
+| NTAG216  | 888 bytes | OpenTag Lite + Extended |
 
 <img src="./images/mifareclassicsticker.jpg" width="200">
 
-NTAG216 tags are cheap and common. They allow 888 bytes of data, which is plenty of space to store required information. NFC tags such as NTAG216 can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
+NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
 
-NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
-
-- More memory (NTAG216: 888-bytes usable, MF1K: 768-bytes usable)
-- Smartphone Support: NTAG216 can be read from smartphones, while MF1K requires a dedicated reader
-- Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG216 tags as well
+- Smartphone Support: NTAG213/215/216 can be read from smartphones, while MF1K requires a dedicated reader
+- Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG tags as well
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
-If a filament manufacturer wishes to only implement the core data for their spools, then the NTAG213 (144-byte) tags are a valid alternative.
-
-In the current version of the specification, NTAG215 (540-byte) tags are also compatible.
+Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes.
 
 ## Mechanical Standard
 
@@ -117,9 +118,9 @@ The NFC tags should be placed on the spools as follows:
 
 ## Data Structure Standard
 
-This is a list of data that will live on the RFID chip, separated into required and optional data. All REQUIRED data must be populated to be compliant with this open source RFID protocol.
+This is a list of data that will live on the RFID chip, separated into required and optional data. All **REQUIRED** data must be populated to be compliant with this open source RFID protocol.
 
-NTAG216 tags have 888 bytes of usable memory.
+NTAG213 tags have 144 bytes of usable memory, which is the minimum requirement for OpenTag3D. NTAG216 tags have 888 bytes of usable memory.
 
 ### Memory Map - OpenTag3D Lite
 
@@ -148,8 +149,6 @@ All integers are unsigned, big endian, unless specified otherwise.
 
 This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields are populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
 This memory address starts at address 144, which is just outside the range of NTAG213.
-
-We should do our best to remain within memory address, which has a max address of 0x20B.
 
 | Field                            | Data Type  | Start Address | Size (bytes) | Usage        | Example                        | Description                                                                                    |
 | -------------------------------- | ---------- | ------------- | ------------ | ------------ | ------------------------------ | ---------------------------------------------------------------------------------------------- |
