@@ -103,7 +103,7 @@ NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Ba
 - Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG tags as well
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
-Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes.
+Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes, and additional data could be stored within 504 bytes.
 
 ## Mechanical Standard
 
