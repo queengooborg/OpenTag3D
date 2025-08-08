@@ -89,11 +89,11 @@ Did you make a design to add RFID to your printer? Let us know so we can link to
 
 The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
 
-| Tag Type | Capacity  | Compatibility           |
-| -------- | --------- | ----------------------- |
-| NTAG213  | 144 bytes | OpenTag Core            |
-| NTAG215  | 504 bytes | OpenTag Core + Extended |
-| NTAG216  | 888 bytes | OpenTag Core + Extended |
+| Tag Type | Capacity  | Compatibility   |
+| -------- | --------- | --------------- |
+| NTAG213  | 144 bytes | Core            |
+| NTAG215  | 504 bytes | Core + Extended |
+| NTAG216  | 888 bytes | Core + Extended |
 
 <img src="./images/mifareclassicsticker.jpg" width="200">
 
