@@ -102,7 +102,7 @@ NFC NTAG216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab 
 
 If a filament manufacturer wishes to only implement the core data for their spools, then the NTAG213 (144-byte) tags are a valid alternative.
 
-In the current version of the specification, NTAG215 (540-byte) tags are also compatible, but is just underneath the amount of bytes reserved for future use.
+In the current version of the specification, NTAG215 (540-byte) tags are also compatible.
 
 ## Mechanical Standard
 
