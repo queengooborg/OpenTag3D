@@ -26,8 +26,8 @@ OpenTag3D aims to standardize the following:
    * [Hardware Standard](#hardware-standard)
    * [Mechanical Standard](#mechanical-standard)
    * [Data Structure Standard](#data-structure-standard)
-      * [Memory Map - OpenTag3D Lite](#memory-map---opentag3d-lite)
-      * [Memory Map - Extended Data](#memory-map---extended-data)
+      * [Memory Map - OpenTag3D Core](#memory-map---opentag3d-core)
+      * [Memory Map - OpenTag3D Extended](#memory-map---opentag3d-extended)
       * [Web API Standard](#web-api-standard)
    * [OpenTag3D Consortium](#opentag3d-consortium)
       * [Voting Members](#voting-members)
@@ -91,9 +91,9 @@ The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. T
 
 | Tag Type | Capacity  | Compatibility           |
 | -------- | --------- | ----------------------- |
-| NTAG213  | 144 bytes | OpenTag Lite            |
-| NTAG215  | 504 bytes | OpenTag Lite + Extended |
-| NTAG216  | 888 bytes | OpenTag Lite + Extended |
+| NTAG213  | 144 bytes | OpenTag Core            |
+| NTAG215  | 504 bytes | OpenTag Core + Extended |
+| NTAG216  | 888 bytes | OpenTag Core + Extended |
 
 <img src="./images/mifareclassicsticker.jpg" width="200">
 
@@ -122,7 +122,7 @@ This is a list of data that will live on the RFID chip, separated into required 
 
 NTAG213 tags have 144 bytes of usable memory, which is the minimum requirement for OpenTag3D. NTAG216 tags have 888 bytes of usable memory.
 
-### Memory Map - OpenTag3D Lite
+### Memory Map - OpenTag3D Core
 
 This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
 All strings are UTF-8 unless specified otherwise.
@@ -145,7 +145,7 @@ All integers are unsigned, big endian, unless specified otherwise.
 | RESERVED                | —              | 0x58–0x6C     | —            | —            | —                                 | Reserved for future use. This goes up to the memory limit of NTAG213.                                                                                                                           |
 | Online Data URL         | String (ASCII) | 0x6D          | 32           | Operational  | `pfil.us?i=8078-RQSR`             | URL to access online JSON additional parameters. Formatted without `https` to save space.                                                                                                       |
 
-### Memory Map - Extended Data
+### Memory Map - OpenTag3D Extended
 
 This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields are populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
 This memory address starts at address 144, which is just outside the range of NTAG213.
