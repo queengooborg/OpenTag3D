@@ -215,11 +215,14 @@ These are topics that are commonly brought up when learning about OpenTag3D. Bel
   - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
   - The hardware used for reading MIFARE tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
 - JSON vs Memory Map
-  - Formats such as JSON (human-readable text) takes up considerably more more memory than memory mapped. For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability.
-  - NTAG216 tags only have 888 bytes of usable memory, which would be eaten up quickly
+  - Formats such as JSON (human-readable text) take up considerably more more memory than memory mapped
+    - For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability
+  - NTAG216 tags only have 888 bytes of usable memory, and NTAG213 tags only have 144 bytes, which would be eaten up quickly
+    - With memory mapping, the core data was able to easily fit in 144 bytes
 - Lookup Tables
-  - OpenTag3D does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard.
-  - Lookup tables can quickly become outdated, which would require regular updates to tag readers to make sure they've downloaded the most recent table.
+  - OpenTag3D does NOT use lookup tables, which would be too difficult to maintain due to the decentralized nature of this standard
+  - Lookup tables can quickly become outdated, which would require regular updates to tag readers to make sure they've downloaded the most recent table
   - Storing lookup tables consumes more memory on the device that reads tags
-  - On-demand lookup (via the internet) would require someone to host a database. Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag3D format in the hands of a single person/company
+  - On-demand lookup (via the internet) would require someone to host a database
+    - Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag3D format in the hands of a single person/company
   - Rather than representing data as a number (such as "company #123 = Example Company), the plain-text company name should be used instead
