@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Update TOC
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - run: |
           curl https://raw.githubusercontent.com/ekalinin/github-markdown-toc/master/gh-md-toc -o gh-md-toc
           chmod a+x gh-md-toc
