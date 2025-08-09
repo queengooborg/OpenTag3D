@@ -24,6 +24,6 @@ jobs:
             ./gh-md-toc --insert --no-backup --hide-footer --skip-header $file
           done
           rm gh-md-toc
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: Auto update markdown TOC
