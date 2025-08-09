@@ -6,3 +6,9 @@ url: "https://opentag3d.info" # the base hostname & protocol for your site, e.g.
 
 aux_links:
   View on GitHub: https://github.com/queengooborg/OpenTag3D
+
+nav_external_links:
+  - title: GitHub Repository
+    url: https://github.com/queengooborg/OpenTag3D
+
+color_scheme: dark
