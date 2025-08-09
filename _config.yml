@@ -1,0 +1,8 @@
+title: OpenTag3D
+description: OpenTag3D, an open source filament RFID standard
+theme: just-the-docs
+
+url: "https://opentag3d.info" # the base hostname & protocol for your site, e.g. http://example.com
+
+aux_links:
+  GitHub Repo: https://github.com/queengooborg/OpenTag3D
