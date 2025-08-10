@@ -1,0 +1,15 @@
+@media (min-width: 66.5rem) {
+	.side-bar {
+		width: 15.5rem;
+	}
+
+	.side-bar + .main {
+		margin-left: 15.5rem;
+	}
+}
+
+@media (min-width: 50rem) {
+	.main {
+		max-width: 100vw;
+	}
+}

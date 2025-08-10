@@ -12,7 +12,7 @@ OpenTag3D aims to standardize the following:
 - **Data Structure** - What data should be stored on the RFID tag, and how that data should be formatted
 - **Web API** - How extended data should be formatted when an optional online spool lookup is requested
 
-<img src="./images/SpoolTag.jpg" height=300>
+<img src="./images/SpoolTag.jpg" width="300">
 
 # Table of Contents
 
