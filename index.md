@@ -12,7 +12,7 @@ header:
   # caption: "Photo credit: [**Unsplash**](https://unsplash.com)"
 excerpt: "An open source standard for 3D printer filament RFID tags. Designed for compatibility between printers, filament manufacturers, and accessories, implementation is simple and low-cost."
 intro:
-  - excerpt: "RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest. OpenTag3D strives to be a standard that allows RFID tags to work across all brands."
+  - excerpt: "Proprietary locks you in. Open sets you free. — [Tim Berners-Lee](https://www.w3.org/People/Berners-Lee/)"
 feature_row:
   - title: "Open Standard, Open To All"
     excerpt: "No more proprietary, locked-down filament tags. OpenTag3D works across 3D printer brands, filament makers, accessories, and hobbyist projects. The memory map is openly documented, with no encryption or vendor lock-in, so anyone, from major manufacturers to individual makers, can build, read, and write compatible tags."
@@ -30,7 +30,11 @@ feature_row:
 
 {% include feature_row id="intro" type="center" %}
 
+>
+
 {% include feature_row %}
+
+RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest. OpenTag3D strives to be a standard that allows RFID tags to work across all brands.
 
 OpenTag3D defines a standard for the following:
 
@@ -38,8 +42,6 @@ OpenTag3D defines a standard for the following:
 - **Mechanical Requirements** - Positioning of tag on the spool
 - **Data Structure** - What data should be stored on the RFID tag, and how that data should be formatted
 - **Web API** - How extended data should be formatted when an optional online spool lookup is requested
-
----
 
 Backed by several companies:
 
