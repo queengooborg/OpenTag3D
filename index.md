@@ -32,7 +32,7 @@ feature_row:
 
 {% include feature_row %}
 
-OpenTag3D aims to standardize the following:
+OpenTag3D defines a standard for the following:
 
 - **Hardware** - The specific underlying RFID technology
 - **Mechanical Requirements** - Positioning of tag on the spool
