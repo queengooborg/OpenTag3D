@@ -107,7 +107,7 @@ The exact contents of this data are still open to discussion, and it is not requ
 
 ## Previous Considerations
 
-These are topics that are commonly brought up when learning about OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
+These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
 - NTAG vs MIFARE
   - NTAG213/215/216 is compatible with smartphones
