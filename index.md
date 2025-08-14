@@ -46,7 +46,7 @@ Backed by several companies:
 <!-- prettier-ignore-start -->
 
 <ul>
-  {%- for b in site.data.backers.backers | sort: "name" -%}
+  {%- for b in site.data.backers.backers -%}
     <li><a href="{{ b.url }}">{{ b.name }}</a></li>
   {%- endfor -%}
 </ul>
