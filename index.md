@@ -26,7 +26,6 @@ feature_row:
     excerpt: "All the critical data a 3D printer needs (such as manufacturer, material, color, print settings, and more) fits neatly within 144 bytes on an NTAG213. For manufacturers who want to include additional details like serial numbers, production data, or extended specifications, the NTAG215 and NTAG216 provide ample extra space without changing compatibility."
     # image_path: /assets/images/unsplash-gallery-image-3-th.jpg
     alt: ""
-
 ---
 
 {% include feature_row id="intro" type="center" %}
@@ -39,3 +38,17 @@ OpenTag3D aims to standardize the following:
 - **Mechanical Requirements** - Positioning of tag on the spool
 - **Data Structure** - What data should be stored on the RFID tag, and how that data should be formatted
 - **Web API** - How extended data should be formatted when an optional online spool lookup is requested
+
+---
+
+Backed by several companies:
+
+<!-- prettier-ignore-start -->
+
+<ul>
+  {%- for b in site.data.backers.backers | sort: "name" -%}
+    <li><a href="{{ b.url }}">{{ b.name }}</a></li>
+  {%- endfor -%}
+</ul>
+
+<!-- prettier-ignore-end -->

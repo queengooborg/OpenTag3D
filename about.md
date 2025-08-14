@@ -14,16 +14,29 @@ As the OpenTag3D protocol began to reach maturity, it was later moved to its own
 
 These are companies that are implementing OpenTag3D into their printers, filament, add-ons, etc. If you would like to join this list, please open an [Issue on GitHub](https://github.com/queengooborg/OpenTag3D/issues/new).
 
-- Filament Manufacturers:
-  - [Polar Filament](https://polarfilament.com) (Backed 2024-02-25)
-  - [Ecogenesis Biopolymers](https://ecogenesisbiopolymers.com) (Backed 2024-09-20)
-  - [3D Fuel](https://www.3dfuel.com/) (Backed 2024-10-30)
-  - [Numakers](https://numakers.com/) (Backed 2024-11-24)
-  - [American Filament](https://americanfilament.us) (Backed 2025-01-20)
-- Printers + Hardware:
-  - [OpenSpool](https://www.youtube.com/watch?v=ah7dm-dtQ5w) ([GitHub Source](https://github.com/spuder/OpenSpool)) (Backed 2024-10-23)
-  - [Cosmyx](https://www.cosmyx3d.com/) (Backed 2024-10-30)
-  - [Distrifab](https://distrifab.fr/) (Backed 2024-10-30)
+<!-- prettier-ignore-start -->
+
+{%- assign cats = site.data.backers.categories -%}
+{%- assign all = site.data.backers.backers -%}
+{%- assign category_order = "filament,hardware" | split: "," -%}
+
+<ul>
+{%- for cat in category_order -%}
+  {%- assign label = cats[cat] -%}
+  {%- assign items = all | where: "category", cat | sort: "backed" -%}
+  {%- if items.size > 0 -%}
+    <li>{{ label }}
+      <ul>
+        {%- for b in items -%}
+          <li><a href="{{ b.url }}">{{ b.name }}</a> (Backed {{ b.backed }})</li>
+        {%- endfor -%}
+      </ul>
+    </li>
+  {%- endif -%}
+{%- endfor -%}
+</ul>
+
+<!-- prettier-ignore-end -->
 
 # Why RFID?
 
