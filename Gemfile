@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
-# gem "jekyll", "~> 4.4.1" # installed by `gem jekyll`
 gem "github-pages", group: :jekyll_plugins
+gem "jekyll-include-cache", group: :jekyll_plugins
 
-gem "just-the-docs" # Jekyll Theme
+# gem "just-the-docs" # Jekyll Theme
+gem "minimal-mistakes-jekyll" # Theme
