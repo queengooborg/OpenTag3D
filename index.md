@@ -30,8 +30,6 @@ feature_row:
 
 {% include feature_row id="intro" type="center" %}
 
->
-
 {% include feature_row %}
 
 RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest. OpenTag3D strives to be a standard that allows RFID tags to work across all brands.

@@ -12,7 +12,7 @@ As the OpenTag3D protocol began to reach maturity, it was later moved to its own
 
 # Backers
 
-These are companies that are implementing OpenTag3D into their printers, filament, add-ons, etc. If you would like to join this list, please open an [Issue on GitHub](https://github.com/queengooborg/OpenTag3D/issues/new).
+These are companies that are implementing OpenTag3D into their printers, filament, add-ons, etc. If you would like to join this list, please open an [Issue on GitHub](https://github.com/queengooborg/OpenTag3D/issues/new?template=backer.yml).
 
 <!-- prettier-ignore-start -->
 

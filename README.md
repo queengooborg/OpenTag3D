@@ -17,4 +17,4 @@ The specification is hosted on the [OpenTag3D website](https://opentag3d.info/sp
 
 OpenTag3D is backed by various companies that are implementing OpenTag3D into their printers, filament, add-ons, etc. See the list of companies [on the About page of the website](https://opentag3d.info/about#backers).
 
-Want to join the list? [Open an issue here!](https://github.com/queengooborg/OpenTag3D/issues/new)
+Want to join the list? [Open an issue here!](https://github.com/queengooborg/OpenTag3D/issues/new?template=backer.yml)
