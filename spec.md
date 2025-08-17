@@ -45,11 +45,13 @@ This is a list of data that will live on the RFID chip, separated into required 
 
 NTAG213 tags have 144 bytes of usable memory, which is the minimum requirement for OpenTag3D. NTAG216 tags have 888 bytes of usable memory.
 
+All strings are UTF-8 unless specified otherwise. All integers are unsigned, big endian, unless specified otherwise.
+
+Temperatures are stored in Celsius, divided by 5.
+
 ### Memory Map - OpenTag3D Core
 
 This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
-All strings are UTF-8 unless specified otherwise.
-All integers are unsigned, big endian, unless specified otherwise.
 
 | Field                   | Data Type      | Start Address | Size (bytes) | Usage        | Example                           | Description                                                                                                                                     |
 | ----------------------- | -------------- | ------------- | ------------ | ------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -70,7 +72,10 @@ All integers are unsigned, big endian, unless specified otherwise.
 
 ### Memory Map - OpenTag3D Extended
 
-This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields are populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF)
+This is additional data that not all manufacturers will implement, typically due to technological restrictions.
+
+These fields should be populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF).
+
 This memory address starts at address 144, which is just outside the range of NTAG213.
 
 | Field                                | Data Type  | Start Address | Size (bytes) | Usage        | Example                        | Description                                                           |
@@ -103,7 +108,8 @@ Some tags can contain extended data that doesn't fit or doesn't belong on the RF
 These complex variables can be looked up using the "web API" URL that is stored on the RFID tag.
 
 The format of this data should be JSON.
-The exact contents of this data are still open to discussion, and it is not required to launch the OpenTag3D standard. The web API can be implemented in the future without affecting the launch of OpenTag3D.
+
+The web API has not yet been defined for OpenTag3D, as the exact contents of this data are still open to discussion.
 
 ## Previous Considerations
 
