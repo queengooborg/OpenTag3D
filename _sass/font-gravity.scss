@@ -1,0 +1,71 @@
+@charset "utf-8";
+
+/* UltraLight */
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-UltraLight.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-UltraLightItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+}
+
+/* Light */
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-Light.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-LightItalic.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+}
+
+/* Book */
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-Book.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-BookItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* Regular */
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Bold */
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Gravity";
+  src: url("/assets/fonts/Gravity-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+}
