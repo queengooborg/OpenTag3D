@@ -6,7 +6,7 @@ toc: true
 
 # OpenTag3D Standards
 
-Current Version: 0.001
+Current Version: {{ site.opentag_version }}
 
 > [!CAUTION]
 > OpenTag3D is not yet production ready. The spec is still being finalized. When it is ready, the version number will become 1.000.

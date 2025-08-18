@@ -11,6 +11,8 @@ plugins:
   - jekyll-include-cache
   - jekyll-gfm-admonitions
 
+opentag_version: 0.001
+
 # Theme settings
 minimal_mistakes_skin: dark
 enable_copy_code_button: true
