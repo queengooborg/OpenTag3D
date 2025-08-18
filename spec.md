@@ -108,7 +108,8 @@ Some tags can contain extended data that doesn't fit or doesn't belong on the RF
 These complex variables can be looked up using the "web API" URL that is stored on the RFID tag.
 
 The format of this data should be JSON.
-The exact contents of this data are still open to discussion, and it is not required to launch the OpenTag3D standard. The web API can be implemented in the future without affecting the launch of OpenTag3D.
+
+The web API has not yet been defined for OpenTag3D, as the exact contents of this data are still open to discussion.
 
 ## Previous Considerations
 
