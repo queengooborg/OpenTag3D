@@ -1,5 +1,6 @@
 ---
 title: OpenTag3D
+logo: ./assets/images/logo.svg
 layout: splash
 permalink: /
 header:
