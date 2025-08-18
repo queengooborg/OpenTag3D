@@ -48,11 +48,13 @@ This is a list of data that will live on the RFID chip, separated into required 
 
 NTAG213 tags have 144 bytes of usable memory, which is the minimum requirement for OpenTag3D. NTAG216 tags have 888 bytes of usable memory.
 
+All strings are UTF-8 unless specified otherwise. All integers are unsigned, big endian, unless specified otherwise.
+
+Temperatures are stored in Celsius, divided by 5.
+
 ### Memory Map - OpenTag3D Core
 
 This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
-All strings are UTF-8 unless specified otherwise.
-All integers are unsigned, big endian, unless specified otherwise.
 
 | Field                   | Data Type      | Start Address | Size (bytes) | Usage        | Example                           | Description                                                                                                                                                                                     |
 | ----------------------- | -------------- | ------------- | ------------ | ------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
