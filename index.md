@@ -32,8 +32,6 @@ feature_row:
 
 {% include feature_row %}
 
-{: .notice--danger}
-
 > [!CAUTION]
 > OpenTag3D is not yet production ready. The spec is still being finalized.
 
