@@ -33,7 +33,9 @@ feature_row:
 {% include feature_row %}
 
 {: .notice--danger}
-**Notice:** OpenTag3D is not yet production ready. The spec is still being finalized.
+
+> [!CAUTION]
+> OpenTag3D is not yet production ready. The spec is still being finalized.
 
 RFID is becoming more prevalent, with each company launching their own RFID system that is incompatible with the rest. OpenTag3D strives to be a standard that allows RFID tags to work across all brands.
 
