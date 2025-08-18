@@ -56,8 +56,8 @@ This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG2
 | Field                 | Unit    | Data Type      | Start Address | Size (bytes) | Usage        | Example                           | Description                                                                                                                                     |
 | --------------------- | ------- | -------------- | ------------- | ------------ | ------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Tag Format            | String  | String (ASCII) | 0x10          | 2            | Operational  | `OT`                              | This is always "OT", this helps differentiate between the OpenTag3D and other formats.                                                          |
-| Tag Version           | Version | Int            | 0x12          | 2            | Operational  | `1234`                            | RFID tag data format version, stored as an int with 3 implied decimal points. Eg `1000` → version `1.000`.                                      |
-| Filament Manufacturer | String  | String         | 0x14          | 16           | Display-only | `"Polar Filament"`                | String representation of filament manufacturer. 16 bytes is the max data length per block. Longer names should be abbreviated or truncated.     |
+| Tag Version           | Version | Int            | 0x12          | 2            | Operational  | `1234`                            | RFID tag data format version, with 3 implied decimal points. Eg `1000` → version `1.000`.                                                       |
+| Filament Manufacturer | String  | String         | 0x14          | 16           | Display-only | `"Polar Filament"`                | Name of filament manufacturer. Long names should be abbreviated or truncated.                                                                   |
 | Base Material Name    | String  | String         | 0x24          | 5            | Display-only | `"PLA"`, `"PETG"`, `"PCTFE"`      | Material name in plain text, excluding any modifiers.                                                                                           |
 | Material Modifiers    | String  | String         | 0x29          | 5            | Display-only | `"CF"`, `"HF"`, `"Pro"`, `"Silk"` | Material subcategory or modifier in plain text. Long modifiers may need to be abbreviated.                                                      |
 | Color Name            | String  | String         | 0x2E          | 32           | Display-only | `"Blue"`, `"Electric Watermelon"` | Color in plain text.                                                                                                                            |
@@ -68,7 +68,7 @@ This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG2
 | Bed Temperature       | °C ÷5   | Int            | 0x57          | 1            | Operational  | `12`, `16`                        | Recommended bed temperature in degrees Celsius, divided by 5. For example, `12` = `60°C`.                                                       |
 | Density               | µg      | Int            | 0x58          | 2            | Operational  | `1240`, `3900`                    | Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`.                                                             |
 | RESERVED              | -       | —              | 0x5A–0x6C     | —            | —            | —                                 | Reserved for future use. This goes up to the memory limit of NTAG213.                                                                           |
-| Online Data URL       | String  | String (ASCII) | 0x6D          | 32           | Operational  | `pfil.us?i=8078-RQSR`             | URL to access online JSON additional parameters. Formatted without `https` to save space.                                                       |
+| Online Data URL       | URL     | String (ASCII) | 0x6D          | 32           | Operational  | `pfil.us?i=8078-RQSR`             | URL to access online JSON additional parameters. Formatted without `https` to save space.                                                       |
 
 ### Memory Map - OpenTag3D Extended
 
@@ -87,11 +87,11 @@ This memory address starts at address 144, which is just outside the range of NT
 | MFI Temp                   | °C ÷5   | Int        | 0xB8          | 1            | Operational  | `210`                          | MFI test temperature, divided by 5. For example, `42` = `210ºC`.      |
 | MFI Load                   | g ÷10   | Int        | 0xB9          | 1            | Operational  | `216`                          | MFI test load grams, divided by 10. For example, `216` = `2.16kg`.    |
 | MFI Value                  | g/10min | Int        | 0xBA          | 1            | Operational  | `63`                           | MFI value, divided by 10.                                             |
-| Measured Tolerance         |         | Int        | 0xBB          | 1            | Operational  | `20`, `55`                     | Measured tolerance in µm (micrometers).                               |
+| Measured Tolerance         | µm      | Int        | 0xBB          | 1            | Operational  | `20`, `55`                     | Measured tolerance in µm (micrometers).                               |
 | Empty Spool Weight         | g       | Int        | 0xBC          | 2            | Operational  | `105`                          | Weight of empty spool in grams.                                       |
-| Measured Filament Weight   |         | Int        | 0xBE          | 2            | Operational  | `1002`                         | Weight of filament only.                                              |
-| Measured Filament Length   |         | Int        | 0xC0          | 2            | Operational  | `336`                          | Length in meters.                                                     |
-| TD (Transmission Distance) |         | Int        | 0xC2          | 2            | Operational  | `2540`                         | Opaque thickness in µm (micrometers).                                 |
+| Measured Filament Weight   | g       | Int        | 0xBE          | 2            | Operational  | `1002`                         | Weight of filament only.                                              |
+| Measured Filament Length   | m       | Int        | 0xC0          | 2            | Operational  | `336`                          | Length in meters.                                                     |
+| TD (Transmission Distance) | µm      | Int        | 0xC2          | 2            | Operational  | `2540`                         | Opaque thickness in µm (micrometers).                                 |
 | Max Dry Temp               | °C ÷5   | Int        | 0xC4          | 1            | Operational  | `10`, `11`                     | Max safe drying temp, divided by 5.                                   |
 | Dry Time                   | hr      | Int        | 0xC5          | 1            | Operational  | `4`, `8`, `12`                 | Recommended drying time.                                              |
 | Min Print Temp             | °C ÷5   | Int        | 0xC6          | 1            | Operational  | `38`                           | Minimum nozzle temp, divided by 5. For example, `38` = `190ºC`.       |
@@ -99,7 +99,7 @@ This memory address starts at address 144, which is just outside the range of NT
 | Min Volumetric Speed       | mm³/s   | Int        | 0xC8          | 1            | Operational  | `20`                           | Min speed recommendation.                                             |
 | Max Volumetric Speed       | mm³/s   | Int        | 0xC9          | 1            | Operational  | `120`                          | Max safe speed.                                                       |
 | Target Volumetric Speed    | mm³/s   | Int        | 0xCA          | 1            | Operational  | `80`                           | Default recommended speed.                                            |
-| RESERVED                   |         | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                              |
+| RESERVED                   | -       | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                              |
 
 ### Web API Standard
 
