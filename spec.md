@@ -78,28 +78,28 @@ These fields should be populated if available. All unused fields must be populat
 
 This memory address starts at address 144, which is just outside the range of NTAG213.
 
-| Field                        | Unit    | Data Type  | Start Address | Size (bytes) | Usage        | Example                        | Description                                                           |
-| ---------------------------- | ------- | ---------- | ------------- | ------------ | ------------ | ------------------------------ | --------------------------------------------------------------------- |
-| Serial Number / Batch ID     | String  | String     | 0xA0          | 16           | Display-Only | `1234-ABCD`, `2024-01-23-1234` | Manufacturer's identifier for a spool batch or serial number.         |
-| Manufacture Date             | Date    | Int[2+1+1] | 0xB0          | 4            | Display-Only | `[2024, 01, 23]`               | Stored as 2 bytes for year, then 1 byte for month and 1 byte for day. |
-| Manufacture Time             | Time    | Int[1+1+1] | 0xB4          | 3            | Display-Only | `[10, 30, 45]`                 | Stored as 1 byte each for hour, minute, and second in 24-hour UTC.    |
-| Spool Core Diameter          | mm      | Int        | 0xB7          | 1            | Operational  | `100`, `80`                    | Core diameter in mm (millimeters).                                    |
-| MFI Temp                     | °C ÷5   | Int        | 0xB8          | 1            | Operational  | `210`                          | MFI test temperature, divided by 5. For example, `42` = `210ºC`.      |
-| MFI Load                     | g ÷10   | Int        | 0xB9          | 1            | Operational  | `216`                          | MFI test load grams, divided by 10. For example, `216` = `2.16kg`.    |
-| MFI Value                    | g/10min | Int        | 0xBA          | 1            | Operational  | `63`                           | MFI value, divided by 10.                                             |
-| Measured Tolerance           |         | Int        | 0xBB          | 1            | Operational  | `20`, `55`                     | Measured tolerance in µm (micrometers).                               |
-| Empty Spool Weight           | g       | Int        | 0xBC          | 2            | Operational  | `105`                          | Weight of empty spool in grams.                                       |
-| Measured Filament Weight     |         | Int        | 0xBE          | 2            | Operational  | `1002`                         | Weight of filament only.                                              |
-| Measured Filament Length     |         | Int        | 0xC0          | 2            | Operational  | `336`                          | Length in meters.                                                     |
-| TD (Transmission Distance)   |         | Int        | 0xC2          | 2            | Operational  | `2540`                         | Opaque thickness in µm (micrometers).                                 |
-| Max Dry Temp                 | °C ÷5   | Int        | 0xC4          | 1            | Operational  | `10`, `11`                     | Max safe drying temp, divided by 5.                                   |
-| Dry Time                     | hr      | Int        | 0xC5          | 1            | Operational  | `4`, `8`, `12`                 | Recommended drying time.                                              |
-| Min Print Temp               | °C ÷5   | Int        | 0xC6          | 1            | Operational  | `38`                           | Minimum nozzle temp, divided by 5. For example, `38` = `190ºC`.       |
-| Max Print Temp               | °C ÷5   | Int        | 0xC7          | 1            | Operational  | `45`                           | Maximum nozzle temp, divided by 5.                                    |
-| Volumetric Speed Min         | mm³/s   | Int        | 0xC8          | 1            | Operational  | `20`                           | Min speed recommendation.                                             |
-| Volumetric Speed Max         | mm³/s   | Int        | 0xC9          | 1            | Operational  | `120`                          | Max safe speed.                                                       |
-| Volumetric Speed Recommended | mm³/s   | Int        | 0xCA          | 1            | Operational  | `80`                           | Default recommended speed.                                            |
-| RESERVED                     |         | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                              |
+| Field                      | Unit    | Data Type  | Start Address | Size (bytes) | Usage        | Example                        | Description                                                           |
+| -------------------------- | ------- | ---------- | ------------- | ------------ | ------------ | ------------------------------ | --------------------------------------------------------------------- |
+| Serial Number / Batch ID   | String  | String     | 0xA0          | 16           | Display-Only | `1234-ABCD`, `2024-01-23-1234` | Manufacturer's identifier for a spool batch or serial number.         |
+| Manufacture Date           | Date    | Int[2+1+1] | 0xB0          | 4            | Display-Only | `[2024, 01, 23]`               | Stored as 2 bytes for year, then 1 byte for month and 1 byte for day. |
+| Manufacture Time           | Time    | Int[1+1+1] | 0xB4          | 3            | Display-Only | `[10, 30, 45]`                 | Stored as 1 byte each for hour, minute, and second in 24-hour UTC.    |
+| Spool Core Diameter        | mm      | Int        | 0xB7          | 1            | Operational  | `100`, `80`                    | Core diameter in mm (millimeters).                                    |
+| MFI Temp                   | °C ÷5   | Int        | 0xB8          | 1            | Operational  | `210`                          | MFI test temperature, divided by 5. For example, `42` = `210ºC`.      |
+| MFI Load                   | g ÷10   | Int        | 0xB9          | 1            | Operational  | `216`                          | MFI test load grams, divided by 10. For example, `216` = `2.16kg`.    |
+| MFI Value                  | g/10min | Int        | 0xBA          | 1            | Operational  | `63`                           | MFI value, divided by 10.                                             |
+| Measured Tolerance         |         | Int        | 0xBB          | 1            | Operational  | `20`, `55`                     | Measured tolerance in µm (micrometers).                               |
+| Empty Spool Weight         | g       | Int        | 0xBC          | 2            | Operational  | `105`                          | Weight of empty spool in grams.                                       |
+| Measured Filament Weight   |         | Int        | 0xBE          | 2            | Operational  | `1002`                         | Weight of filament only.                                              |
+| Measured Filament Length   |         | Int        | 0xC0          | 2            | Operational  | `336`                          | Length in meters.                                                     |
+| TD (Transmission Distance) |         | Int        | 0xC2          | 2            | Operational  | `2540`                         | Opaque thickness in µm (micrometers).                                 |
+| Max Dry Temp               | °C ÷5   | Int        | 0xC4          | 1            | Operational  | `10`, `11`                     | Max safe drying temp, divided by 5.                                   |
+| Dry Time                   | hr      | Int        | 0xC5          | 1            | Operational  | `4`, `8`, `12`                 | Recommended drying time.                                              |
+| Min Print Temp             | °C ÷5   | Int        | 0xC6          | 1            | Operational  | `38`                           | Minimum nozzle temp, divided by 5. For example, `38` = `190ºC`.       |
+| Max Print Temp             | °C ÷5   | Int        | 0xC7          | 1            | Operational  | `45`                           | Maximum nozzle temp, divided by 5.                                    |
+| Min Volumetric Speed       | mm³/s   | Int        | 0xC8          | 1            | Operational  | `20`                           | Min speed recommendation.                                             |
+| Max Volumetric Speed       | mm³/s   | Int        | 0xC9          | 1            | Operational  | `120`                          | Max safe speed.                                                       |
+| Target Volumetric Speed    | mm³/s   | Int        | 0xCA          | 1            | Operational  | `80`                           | Default recommended speed.                                            |
+| RESERVED                   |         | —          | 0xCB–0x1FF    | —            | —            | —                              | Reserved for future use.                                              |
 
 ### Web API Standard
 
