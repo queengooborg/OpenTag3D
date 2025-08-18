@@ -20,11 +20,17 @@ $sans-serif:
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
 
+/* Custom CSS */
+
 .layout--single.wide {
   .page,
   .breadcrumbs ol {
     width: 100% !important;
   }
+}
+
+#page-title img {
+  max-width: min(500px, calc(100vw - 1em));
 }
 
 #footer {

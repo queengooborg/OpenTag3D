@@ -1,4 +1,4 @@
-# OpenTag3D: Open Source Filament RFID Standard
+![OpenTag3D: Open Source Filament RFID Standard](./assets/images/logo.svg)
 
 ![Current OpenTag Version (see `_config.yml` for the current version)](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fqueengooborg%2FOpenTag3D%2Frefs%2Fheads%2Fmain%2F_config.yml&query=%24.opentag_version&style=for-the-badge&label=OpenTag%20Version)
 

@@ -21,7 +21,7 @@ The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. T
 | NTAG215  | 504 bytes | Core + Extended |
 | NTAG216  | 888 bytes | Core + Extended |
 
-<img src="./images/ntag-sticker.jpg" width="200">
+<img src="./assets/images/ntag-sticker.jpg" width="200">
 
 NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
 
@@ -40,7 +40,7 @@ The NFC tags should be placed on the spools as follows:
   - For spool sides thicker than 4mm, there must be a cutout to embed the tag, or the tag should be fixed to the outside of the spool
 - Two tags should be used, one on each end of the spool, directly across from each other
 
-<img src="./images/TagLocation.png" width="400">
+<img src="./assets/images/TagLocation.png" width="400">
 
 ## Data Structure Standard
 

@@ -1,7 +1,7 @@
 main:
-  - title: "Home"
-    url: "/"
   - title: "About"
     url: "/about"
   - title: "Spec"
     url: "/spec"
+  - title: "GitHub"
+    url: "https://github.com/queengooborg/OpenTag3D"

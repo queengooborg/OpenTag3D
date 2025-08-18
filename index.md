@@ -1,5 +1,5 @@
 ---
-title: OpenTag3D
+title: "![OpenTag3D](./assets/images/logo.svg)"
 layout: splash
 permalink: /
 header:

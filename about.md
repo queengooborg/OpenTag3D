@@ -58,8 +58,8 @@ This standard was designed to be simple to implement in firmware. You will need 
 
 RFID support can theoretically be added to any printer using off-the-shelf RFID Modules such as the PN532 (as low as $3). This module communicates over SPI.
 
-<img src="./images/PN532-Reader-Blue.png" width=200>
-<img src="./images/PN532-Reader-Red.png" width=200>
+<img src="./assets/images/PN532-Reader-Blue.png" width=200>
+<img src="./assets/images/PN532-Reader-Red.png" width=200>
 
 Did you make a design to add RFID to your printer? Let us know so we can link to it here! Designs can be 3D models, or firmware.
 
