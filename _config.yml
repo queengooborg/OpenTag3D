@@ -9,6 +9,7 @@ locale: en-US
 theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-include-cache
+  - jekyll-gfm-admonitions
 
 opentag_version: 0.002
 

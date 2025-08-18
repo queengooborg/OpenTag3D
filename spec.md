@@ -8,8 +8,8 @@ toc: true
 
 Current Version: {{ site.opentag_version }}
 
-{: .notice--danger}
-**Notice:** OpenTag3D is not yet production ready. The spec is still being finalized. When it is ready, the version number will become 1.000.
+> [!CAUTION]
+> OpenTag3D is not yet production ready. The spec is still being finalized. When it is ready, the version number will become 1.000.
 
 ## Hardware Standard
 
