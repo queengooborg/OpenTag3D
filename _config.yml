@@ -10,6 +10,8 @@ theme: minimal-mistakes-jekyll
 plugins:
   - jekyll-include-cache
 
+opentag_version: 0.002
+
 # Theme settings
 minimal_mistakes_skin: dark
 enable_copy_code_button: true

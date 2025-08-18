@@ -6,7 +6,7 @@ toc: true
 
 # OpenTag3D Standards
 
-Current Version: 0.002
+Current Version: {{ site.opentag_version }}
 
 ## Hardware Standard
 
