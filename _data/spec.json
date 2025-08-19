@@ -183,7 +183,7 @@
         "start": "0xB0",
         "length": 4,
         "usage": "display",
-        "examples": [[2024, 01, 23]],
+        "examples": [[2024, 1, 23]],
         "description": "Stored as 2 bytes for year, then 1 byte for month and 1 byte for day."
       },
       {
