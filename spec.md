@@ -8,9 +8,6 @@ toc: true
 
 Current Version: {{ site.opentag_version }}
 
-> [!CAUTION]
-> OpenTag3D is not yet production ready. The spec is still being finalized. When it is ready, the version number will become 1.000.
-
 ## Hardware Standard
 
 The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
