@@ -12,7 +12,7 @@ plugins:
   - jekyll-include-cache
   - jekyll-gfm-admonitions
 
-opentag_version: 0.001
+opentag_version: 0.002
 
 # Theme settings
 minimal_mistakes_skin: dark
