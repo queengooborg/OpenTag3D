@@ -26,7 +26,8 @@ NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Ba
 - Backwards Compatible: The RFID hardware used for reading MF1K tags typically supports NTAG tags as well
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
-Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes, and additional data could be stored within 504 bytes.
+> [!NOTE]
+> Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes, and additional data could be stored within 504 bytes. So, the NTAG213 and NTAG215 were added as cheaper spec-compliant options.
 
 ## Mechanical Standard
 
@@ -51,7 +52,7 @@ Temperatures are stored in Celsius, divided by 5.
 
 ### Memory Map - OpenTag3D Core
 
-This is designed to fit within 144 bytes (address 0x10-0x9F), which is for NTAG213, the smallest and cheapest variant of compatible tags.
+This is designed to fit within the 144 bytes of writable space on the NTAG213, the smallest and cheapest variant of compatible tags.
 
 {% include spec_table.md set="core" %}
 
@@ -61,7 +62,7 @@ This is additional data that not all manufacturers will implement, typically due
 
 These fields should be populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF).
 
-This memory address starts at address 144, which is just outside the range of NTAG213.
+This memory address starts just outside the range of NTAG213; an NTAG215/216 must be used to store this data.
 
 {% include spec_table.md set="extended" %}
 
@@ -95,4 +96,4 @@ These are topics that were heavily discussed during the development of OpenTag3D
   - Storing lookup tables consumes more memory on the device that reads tags
   - On-demand lookup (via the internet) would require someone to host a database
     - Hosting this data would have costs associated with it, and would also put the control of the entire OpenTag3D format in the hands of a single person/company
-  - Rather than representing data as a number (such as "company #123 = Example Company), the plain-text company name should be used instead
+  - Rather than representing data as a number (such as "company #123 = Example Company"), the plain-text company name should be used instead
