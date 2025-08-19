@@ -1,0 +1,394 @@
+{
+  "version": "0.002",
+  "core": {
+    "address_range": { "start": "0x10", "end": "0x9F" },
+    "fields": [
+      {
+        "name": "Tag Format",
+        "id": "tag_format",
+        "unit": "string",
+        "type": "ascii",
+        "start": "0x10",
+        "length": 2,
+        "usage": "operational",
+        "const": "OT",
+        "examples": ["OT"],
+        "description": "This is always \"OT\", this helps differentiate between the OpenTag3D and other formats."
+      },
+      {
+        "name": "Tag Version",
+        "id": "tag_version",
+        "unit": "version",
+        "type": "int",
+        "start": "0x12",
+        "length": 2,
+        "usage": "operational",
+        "examples": [1234],
+        "description": "RFID tag data format version, with 3 implied decimal points. Eg `1000` → version `1.000`."
+      },
+      {
+        "name": "Filament Manufacturer",
+        "id": "manufacturer",
+        "unit": "string",
+        "type": "utf8",
+        "start": "0x14",
+        "length": 16,
+        "usage": "display",
+        "examples": ["Polar Filament"],
+        "description": "Name of filament manufacturer. Long names should be abbreviated or truncated."
+      },
+      {
+        "name": "Base Material Name",
+        "id": "material_base",
+        "unit": "string",
+        "type": "utf8",
+        "start": "0x24",
+        "length": 5,
+        "usage": "display",
+        "examples": ["PLA", "PETG", "PCTFE"],
+        "description": "Material name in plain text, excluding any modifiers."
+      },
+      {
+        "name": "Material Modifiers",
+        "id": "material_mod",
+        "unit": "string",
+        "type": "utf8",
+        "start": "0x29",
+        "length": 5,
+        "usage": "display",
+        "examples": ["CF", "HF", "Pro", "Silk"],
+        "description": "Material subcategory or modifier in plain text. Long modifiers may need to be abbreviated."
+      },
+      {
+        "name": "Color Name",
+        "id": "color_name",
+        "unit": "string",
+        "type": "utf8",
+        "start": "0x2E",
+        "length": 32,
+        "usage": "display",
+        "examples": ["Blue", "Electric Watermelon"],
+        "description": "Color in plain text."
+      },
+      {
+        "name": "Color Hex",
+        "id": "color",
+        "unit": "RGBA",
+        "type": "rgba",
+        "start": "0x4E",
+        "length": 4,
+        "usage": "display",
+        "channels": ["r", "g", "b", "a"],
+        "examples": [[255, 166, 77, 255]],
+        "description": "Color stored as 4 separate 1-byte integers for red, green, blue and alpha, in the sRGB color space."
+      },
+      {
+        "name": "Target Diameter",
+        "id": "target_diameter",
+        "unit": "µm",
+        "type": "int",
+        "start": "0x52",
+        "length": 2,
+        "usage": "operational",
+        "examples": [1750, 2850],
+        "description": "Filament diameter (target) in µm (micrometers). Eg `1750` → `1.750mm`."
+      },
+      {
+        "name": "Target Weight",
+        "id": "target_weight",
+        "unit": "g",
+        "type": "int",
+        "start": "0x54",
+        "length": 2,
+        "usage": "operational",
+        "examples": [1000, 5000, 750],
+        "description": "Filament weight in grams, excluding spool weight. This is the TARGET weight (e.g., 1kg). Actual measured weight is stored in a different field."
+      },
+      {
+        "name": "Print Temperature",
+        "id": "print_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0x56",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [42],
+        "description": "Recommended print temperature in degrees Celsius, divided by 5. For example, `42` = `210°C`."
+      },
+      {
+        "name": "Bed Temperature",
+        "id": "bed_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0x57",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [12, 16],
+        "description": "Recommended bed temperature in degrees Celsius, divided by 5. For example, `12` = `60°C`."
+      },
+      {
+        "name": "Density",
+        "id": "density",
+        "unit": "µg/cm³",
+        "type": "int",
+        "start": "0x58",
+        "length": 2,
+        "usage": "operational",
+        "examples": [1240, 3900],
+        "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`."
+      },
+      {
+        "name": "RESERVED",
+        "id": "reserved_core",
+        "unit": null,
+        "type": "reserved",
+        "start": "0x5A",
+        "length": 18,
+        "examples": null,
+        "description": "Reserved for future use. This goes up to the memory limit of NTAG213."
+      },
+      {
+        "name": "Online Data URL",
+        "id": "online_data_url",
+        "unit": "string",
+        "type": "ascii",
+        "start": "0x6D",
+        "length": 32,
+        "usage": "operational",
+        "examples": ["pfil.us?i=8078-RQSR"],
+        "description": "URL to access online JSON additional parameters. Formatted without `https` to save space."
+      }
+    ]
+  },
+  "extended": {
+    "address_range": { "start": "0xA0", "end": "0x1FF" },
+    "fields": [
+      {
+        "name": "Serial Number / Batch ID",
+        "id": "serial",
+        "type": "utf8",
+        "start": "0xA0",
+        "length": 16,
+        "usage": "display",
+        "examples": ["1234-ABCD", "2024-01-23-1234"],
+        "description": "Manufacturer's identifier for a spool batch or serial number."
+      },
+      {
+        "name": "Manufacture Date",
+        "id": "mfg_date",
+        "unit": "YYYY,MM,DD",
+        "type": "int[4]",
+        "start": "0xB0",
+        "length": 4,
+        "usage": "display",
+        "examples": [[2024, 01, 23]],
+        "description": "Stored as 2 bytes for year, then 1 byte for month and 1 byte for day."
+      },
+      {
+        "name": "Manufacture Time",
+        "id": "mfg_time",
+        "unit": "UTC hh:mm:ss",
+        "type": "int[3]",
+        "start": "0xB4",
+        "length": 3,
+        "usage": "display",
+        "examples": [[10, 30, 45]],
+        "description": "Stored as 1 byte each for hour, minute, and second in 24-hour UTC."
+      },
+      {
+        "name": "Spool Core Diameter",
+        "id": "spool_core_diameter",
+        "unit": "mm",
+        "type": "int",
+        "start": "0xB7",
+        "length": 1,
+        "usage": "operational",
+        "examples": [100, 80],
+        "description": "Core diameter in mm (millimeters)."
+      },
+      {
+        "name": "MFI Temp",
+        "id": "mfi_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0xB8",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [210],
+        "description": "MFI test temperature, divided by 5. For example, `42` = `210ºC`."
+      },
+      {
+        "name": "MFI Load",
+        "id": "mfi_load",
+        "unit": "g",
+        "type": "int",
+        "start": "0xB9",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 10,
+        "examples": [216],
+        "description": "MFI test load grams, divided by 10. For example, `216` = `2.16kg`."
+      },
+      {
+        "name": "MFI Value",
+        "id": "mfi_value",
+        "unit": "g/10min",
+        "type": "int",
+        "start": "0xBA",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 10,
+        "examples": [63],
+        "description": "MFI value, divided by 10."
+      },
+      {
+        "name": "Measured Tolerance",
+        "id": "measured_tolerance",
+        "unit": "µm",
+        "type": "int",
+        "start": "0xBB",
+        "length": 1,
+        "usage": "operational",
+        "examples": [20, 55],
+        "description": "Measured tolerance in µm (micrometers)."
+      },
+      {
+        "name": "Empty Spool Weight",
+        "id": "empty_spool_weight",
+        "unit": "g",
+        "type": "int",
+        "start": "0xBC",
+        "length": 2,
+        "usage": "operational",
+        "examples": [105],
+        "description": "Weight of empty spool in grams."
+      },
+      {
+        "name": "Measured Filament Weight",
+        "id": "measured_filament_weight",
+        "unit": "g",
+        "type": "int",
+        "start": "0xBE",
+        "length": 2,
+        "usage": "operational",
+        "examples": [1002],
+        "description": "Weight of filament only."
+      },
+      {
+        "name": "Measured Filament Length",
+        "id": "measured_filament_length",
+        "unit": "m",
+        "type": "int",
+        "start": "0xC0",
+        "length": 2,
+        "usage": "operational",
+        "examples": [336],
+        "description": "Length in meters."
+      },
+      {
+        "name": "Transmission Distance (TD)",
+        "id": "td",
+        "unit": "µm",
+        "type": "int",
+        "start": "0xC2",
+        "length": 2,
+        "usage": "operational",
+        "examples": [2540],
+        "description": "Opaque thickness in µm (micrometers)."
+      },
+      {
+        "name": "Max Dry Temp",
+        "id": "max_dry_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0xC4",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [10, 11],
+        "description": "Max safe drying temp, divided by 5."
+      },
+      {
+        "name": "Dry Time",
+        "id": "dry_time",
+        "unit": "hr",
+        "type": "int",
+        "start": "0xC5",
+        "length": 1,
+        "usage": "operational",
+        "examples": [4, 8, 12],
+        "description": "Recommended drying time."
+      },
+      {
+        "name": "Min Print Temp",
+        "id": "min_print_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0xC6",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [38],
+        "description": "Minimum nozzle temp, divided by 5. For example, `38` = `190ºC`."
+      },
+      {
+        "name": "Max Print Temp",
+        "id": "max_print_temp",
+        "unit": "ºC",
+        "type": "int",
+        "start": "0xC7",
+        "length": 1,
+        "usage": "operational",
+        "scaling": 5,
+        "examples": [45],
+        "description": "Maximum nozzle temp, divided by 5."
+      },
+      {
+        "name": "Min Volumetric Speed",
+        "id": "min_vso",
+        "unit": "mm³/s",
+        "type": "int",
+        "start": "0xC8",
+        "length": 1,
+        "usage": "operational",
+        "examples": [20],
+        "description": "Min speed recommendation."
+      },
+      {
+        "name": "Max Volumetric Speed",
+        "id": "max_vso",
+        "unit": "mm³/s",
+        "type": "int",
+        "start": "0xC9",
+        "length": 1,
+        "usage": "operational",
+        "examples": [120],
+        "description": "Max safe speed."
+      },
+      {
+        "name": "Target Volumetric Speed",
+        "id": "target_vso",
+        "unit": "mm³/s",
+        "type": "int",
+        "start": "0xCA",
+        "length": 1,
+        "usage": "operational",
+        "examples": [80],
+        "description": "Default recommended speed."
+      },
+      {
+        "name": "RESERVED",
+        "id": "reserved_extended",
+        "unit": null,
+        "type": "reserved",
+        "start": "0xCB",
+        "length": 308,
+        "examples": null,
+        "description": "Reserved for future use."
+      }
+    ]
+  }
+}
