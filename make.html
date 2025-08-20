@@ -318,7 +318,7 @@ layout: single
           h("span", { class: "chip mono" }, `id:${f.id}`),
           h("span", { class: "chip mono" }, `addr:${f.start}`),
           h("span", { class: "chip mono" }, `len:${f.length}`),
-          (f.unit && ["string", "version"].includes(f.unit)) ? h("span", { class: "chip" }, `unit:${f.unit}`) : "",
+          (f.unit && !(["string", "version"].includes(f.unit))) ? h("span", { class: "chip" }, `unit:${f.unit}`) : "",
           f.scaling ? h("span", { class: "chip" }, `scaling:${f.scaling}`) : "",
         );
         row.append(meta);
