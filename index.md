@@ -53,3 +53,11 @@ Backed by several companies:
 </ul>
 
 <!-- prettier-ignore-end -->
+
+## Add RFID support to your printer
+
+This standard was designed to be simple to implement in firmware. You will need to add custom firmware and potentially an RFID reader (if your printer doesn't already have one).
+
+RFID support can theoretically be added to any printer using off-the-shelf RFID Modules such as the PN532 (as low as $3). This module communicates over SPI.
+
+Did you make a design to add RFID to your printer? Let us know so we can link to it here! Designs can be 3D models, or firmware.
