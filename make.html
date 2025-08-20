@@ -64,11 +64,6 @@ layout: single
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  .row-3 {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
-  }
   .help {
     font-size: 12px;
     color: var(--muted);
@@ -85,7 +80,7 @@ layout: single
   }
   .grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
   }
   .divider {
@@ -151,6 +146,12 @@ layout: single
 
   #controls {
     margin-top: 1em;
+  }
+
+  @media screen and (max-width: 900px), screen and (max-device-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   @media screen and (max-width: 600px), screen and (max-device-width: 600px) {
