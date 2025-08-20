@@ -23,6 +23,7 @@
         "start": "0x12",
         "length": 2,
         "usage": "operational",
+        "scaling": 0.001,
         "examples": [1234],
         "description": "RFID tag data format version, with 3 implied decimal points. Eg `1000` → version `1.000`."
       },
@@ -90,6 +91,7 @@
         "start": "0x52",
         "length": 2,
         "usage": "operational",
+        "scaling": 0.001,
         "examples": [1750, 2850],
         "description": "Filament diameter (target) in µm (micrometers). Eg `1750` → `1.750mm`."
       },
@@ -136,6 +138,7 @@
         "start": "0x58",
         "length": 2,
         "usage": "operational",
+        "scaling": 0.001,
         "examples": [1240, 3900],
         "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`."
       },
