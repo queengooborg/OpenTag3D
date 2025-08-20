@@ -165,13 +165,9 @@ layout: single
 
 <main>
   <div id="controls">
-    <button class="btn" id="downloadBin" disabled>Download .bin</button>
-    <button class="btn" id="downloadFlipper" disabled>
-      Download Flipper .nfc
-    </button>
-    <button class="btn" id="downloadMap" disabled>
-      Download address map (.csv)
-    </button>
+    <button class="btn" id="downloadBin">Download .bin</button>
+    <button class="btn" id="downloadFlipper">Download Flipper .nfc</button>
+    <button class="btn" id="downloadMap">Download address map (.csv)</button>
     <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn btn--warning" id="loadFileBtn">Load File</button>
     <input
@@ -738,12 +734,8 @@ layout: single
     // Update hexdump
     document.getElementById("hexdump").textContent = hexdump(buf, start);
 
-    // Enable exports
-    const enable = (id) => (document.getElementById(id).disabled = false);
-    enable("downloadBin");
-    enable("downloadMap");
-    enable("downloadFlipper");
-    if ("NDEFReader" in window) enable("writeWebNFC");
+    // Enable Web NFC export if applicable
+    if ("NDEFReader" in window) document.getElementById("writeWebNFC").disabled = false;
 
     // Wire export actions (fresh closures)
     document.getElementById("downloadBin").onclick = () =>
