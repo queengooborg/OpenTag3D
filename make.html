@@ -408,6 +408,7 @@ layout: single
       box.append(row, out);
       return box;
     }
+    // XXX Simplify the following code
     if (f.type === "int" && f.id === "target_diameter") {
       const wrap = h("div", { class: "row" });
       const mm = h("input", {
@@ -452,7 +453,7 @@ layout: single
         id: f.id,
         type: "number",
         min: 0,
-        step: "1",
+        step: 5,
         placeholder: "210 (°C)",
       });
       const stored = h("input", { type: "number", readonly: true });
