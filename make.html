@@ -1,0 +1,650 @@
+---
+title: Make a Tag
+layout: single
+---
+
+<style>
+  :root {
+    --card: #131822;
+    --muted: #a9b5c9;
+    --accent: #7aa2ff;
+    --line: #1f2733;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  .tag {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+  .card h2 {
+    margin: 0;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 16px;
+    color: #cfe0ff;
+  }
+  .pad {
+    padding: 14px 16px;
+  }
+  label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #0e1420;
+    border: 1px solid #1e2a3a;
+    outline: none;
+  }
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(122, 162, 255, 0.15);
+  }
+  input:disabled,
+  select:disabled,
+  textarea:disabled {
+    font-style: italic;
+    color: rgb(127, 127, 127);
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .help {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .pill {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    background: #0c1220;
+    border: 1px solid var(--line);
+    padding: 6px 10px;
+    border-radius: 999px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 12px 0;
+  }
+  .flex {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .mono {
+    font-family:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+      "Courier New", monospace;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .kv {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 8px;
+  }
+  .scroll {
+    max-height: 420px;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  pre {
+    margin: 0;
+    padding: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    font-size: 13px;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background: #0e1420;
+  }
+  .field-row {
+    border: 1px dashed #243049;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .chip {
+    display: inline-block;
+    background: #0f1a2b;
+    border: 1px solid #22304a;
+    border-radius: 8px;
+    padding: 2px 6px;
+    font-size: 12px;
+    margin-right: 6px;
+  }
+
+  #controls {
+    margin-top: 1em;
+  }
+
+  @media screen and (max-width: 600px), screen and (max-device-width: 600px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<p>This is a utility to create RFID tag data to be written to your tags.</p>
+
+<main>
+  <div id="controls">
+    <button class="btn" id="downloadBin" disabled>Download .bin</button>
+    <button class="btn" id="downloadFlipper" disabled>
+      Download Flipper .nfc
+    </button>
+    <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
+    <button class="btn" id="downloadMap" disabled>
+      Download address map (.csv)
+    </button>
+    <button class="btn btn--warning" id="copyHex" disabled>
+      Copy hex dump
+    </button>
+  </div>
+  <div id="messages" class="help">
+    <br />
+  </div>
+  <details class="scroll" id="hexdumpBox">
+    <summary>Show hex dump</summary>
+    <pre id="hexdump" class="mono"></pre>
+  </details>
+  <br />
+
+  <section class="card">
+    <h2>Configuration</h2>
+    <div class="pad">
+      <div class="row">
+        <div>
+          <label>Tag type</label>
+          <select id="tagType">
+            <option value="NTAG213" selected>NTAG213 (Core)</option>
+            <option value="NTAG215">NTAG215 (Core + Extended)</option>
+            <option value="NTAG216">NTAG216 (Core + Extended)</option>
+          </select>
+          <div class="help">
+            Determines memory size and whether "extended" fields are included.
+          </div>
+        </div>
+        <div class="flex" style="margin-top: 26px">
+          <button class="btn btn--danger" id="resetBtn">Reset form</button>
+          <button class="btn btn--info" id="exampleBtn">Fill examples</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div id="formHost">
+        <!-- Dynamic form renders here -->
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+  // Spec comes from site.data.spec (Jekyll).
+  const SPEC = {{site.data.spec | jsonify}};
+
+  // Known tag capacities (user memory) in bytes
+  const TAG_CAP = {
+    NTAG213: 144, // 0x10..0x9F
+    NTAG215: 504, // 0x10..0x207
+    NTAG216: 888  // 0x10..0x387
+  };
+
+  const state = {
+    values: new Map(),
+    tagType: 'NTAG213'
+  };
+
+  // --- Utils ---
+  const h = (tag, attrs={}, ...kids) => {
+    const el = document.createElement(tag);
+    for (const [k,v] of Object.entries(attrs)){
+      if (k === 'class') el.className = v; else if (k === 'for') el.htmlFor = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k,v);
+    }
+    for (const k of kids) el.append(k);
+    return el;
+  };
+  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+  const hex = (n,w=2)=>Number(n).toString(16).toUpperCase().padStart(w,'0');
+  const addrHex = a => '0x'+hex(a);
+  const parseHex = s => (typeof s === 'number')? s : parseInt(s,16);
+  const textEncoder = new TextEncoder();
+
+  function packInt(n, len, be=true){
+    n = Math.floor(n||0);
+    const b = new Uint8Array(len);
+    for (let i=0;i<len;i++){
+      const shift = be ? (len-1-i) : i;
+      b[i] = (n >> (8*shift)) & 0xFF;
+    }
+    return b;
+  }
+  function encodeAscii(str, len){
+    const out = new Uint8Array(len);
+    const s = String(str||'');
+    for (let i=0;i<Math.min(len, s.length); i++){
+      const code = s.charCodeAt(i);
+      if (code>0x7F) throw new Error('Non-ASCII character detected');
+      out[i] = code;
+    }
+    return out;
+  }
+  function encodeUtf8(str, len){
+    const enc = textEncoder.encode(String(str||''));
+    const out = new Uint8Array(len);
+    out.set(enc.subarray(0, len));
+    return out;
+  }
+  function rgbaFromHex(hexStr, alpha){
+    const v = String(hexStr||'#000000').replace('#','');
+    return [parseInt(v.slice(0,2)||'00',16), parseInt(v.slice(2,4)||'00',16), parseInt(v.slice(4,6)||'00',16), clamp(Math.round(alpha||255),0,255)];
+  }
+
+  // --- Rendering ---
+  function renderForm(){
+    const host = document.getElementById('formHost');
+    host.innerHTML = '';
+
+    const sections = [
+      {id:'core', title:'Core fields (fit on NTAG213+)'},
+      {id:'extended', title:'Extended fields (NTAG215/216)'}
+    ];
+
+    for (const sec of sections){
+      const def = SPEC[sec.id];
+      if (!def) continue;
+      const box = h('div', {class:'grid'});
+      host.append(h('h3', {class:'muted'}, sec.title));
+      for (const f of def.fields){
+        if (f.type === '-') continue; // skip reserved blocks from UI
+        const row = h('div', {class:'field-row'});
+        const left = h('div');
+        left.append(h('label', {}, `${f.name}`));
+        left.append(renderInputForField(f));
+        row.append(left);
+        const meta = h('div', {class:'help'},
+          h('span', {class:'chip mono'}, `id:${f.id}`),
+          h('span', {class:'chip mono'}, `addr:${f.start}`),
+          h('span', {class:'chip mono'}, `len:${f.length}`),
+          f.unit? h('span', {class:'chip'}, f.unit):'',
+          f.scaling? h('span', {class:'chip'}, `scaling:${f.scaling}`):''
+        );
+        row.append(meta);
+        if (f.description){ row.append(h('div',{class:'help'}, f.description)); }
+        box.append(row);
+      }
+      host.append(box);
+    }
+  }
+
+  function renderInputForField(f){
+    // Tag format constant
+    if (f.id === 'tag_format'){
+      const inp = h('input', {id:f.id, value: (f.const??'OT'), disabled:true});
+      state.values.set(f.id, f.const??'OT');
+      return inp;
+    }
+    // Version as fixed integer (3 implied decimals)
+    if (f.id === 'tag_version'){
+      const v = SPEC.version;
+      const numeric = Math.round(parseFloat(v)*1000)||0;
+      const wrap = h('div', {class:'row'});
+      const vis = h('input', {id:f.id+'_vis', type:'text', value: v, disabled:true});
+      const stored = h('input', {id:f.id, type:'number', value:String(numeric), disabled:true});
+      state.values.set(f.id, numeric);
+      wrap.append(vis, stored);
+      const hint = h('div', {class:'help'}, `Stored as integer with 3 implied decimals → ${numeric}`);
+      const box = h('div'); box.append(wrap, hint); return box;
+    }
+
+    // Generic by type
+    if (f.type === 'ascii' || f.type === 'utf8'){
+      const inp = h('input', {id:f.id, type:'text', placeholder:(f.examples?.[0]||'')});
+      inp.addEventListener('input', ()=> { state.values.set(f.id, inp.value); buildMemory(); });
+      return inp;
+    }
+    if (f.type === 'rgba'){
+      const row = h('div', {class:'row'});
+      const color = h('input', {type:'color', id:f.id+'_rgb', value:'#FFA64D'});
+      const alpha = h('input', {type:'number', id:f.id+'_a', min:0, max:255, step:1, value:255});
+      const out = h('input', {type:'text', id:f.id, readonly:true});
+      const update = ()=>{
+        const rgba = rgbaFromHex(color.value, parseInt(alpha.value||'255',10));
+        out.value = `[${rgba.join(',')}]`;
+        state.values.set(f.id, rgba);
+        buildMemory();
+      };
+      color.addEventListener('input', update);
+      alpha.addEventListener('input', update);
+      update();
+      row.append(color, alpha);
+      const box = h('div'); box.append(row, out); return box;
+    }
+    if (f.type === 'int' && f.id === 'target_diameter'){
+      const wrap = h('div', {class:'row'});
+      const mm = h('input', {type:'number', min:0, step:'0.001', placeholder:'1.750 (mm)'});
+      const stored = h('input', {type:'number', readonly:true});
+      const sync=()=>{ const um = Math.round(parseFloat(mm.value||'0')*1000); stored.value = um; state.values.set(f.id, um); buildMemory(); };
+      mm.addEventListener('input', sync); sync();
+      wrap.append(mm, stored);
+      const hint = h('div',{class:'help'}, 'Enter mm. Stored as µm integer (×1000).');
+      const box = h('div'); box.append(wrap, hint); return box;
+    }
+    if (f.type === 'int' && ['print_temp','bed_temp','mfi_temp','max_dry_temp','min_print_temp','max_print_temp'].includes(f.id)){
+      const wrap = h('div', {class:'row'});
+      const c = h('input', {type:'number', min:0, step:'1', placeholder:'210 (°C)'});
+      const stored = h('input', {type:'number', readonly:true});
+      const scale = f.scaling || 5;
+      const sync = ()=>{ const v = Math.round(parseFloat(c.value||'0')/scale); stored.value = v; state.values.set(f.id, v); buildMemory(); };
+      c.addEventListener('input', sync); sync();
+      wrap.append(c, stored);
+      const hint = h('div',{class:'help'}, `Enter °C. Stored as value/\u200B${scale}. Example: 210→${Math.round(210/scale)}.`);
+      const box = h('div'); box.append(wrap, hint); return box;
+    }
+    if (f.type === 'int' && ['mfi_load','mfi_value'].includes(f.id)){
+      const wrap = h('div', {class:'row'});
+      const human = h('input', {type:'number', min:0, step:'0.1', placeholder: f.id==='mfi_load' ? '2.16 (kg)' : '6.3'});
+      const stored = h('input', {type:'number', readonly:true});
+      const sync = ()=>{
+        let val = parseFloat(human.value||'0');
+        if (f.id==='mfi_load') val = val*1000; // kg→g before /10
+        const v = Math.round(val/10);
+        stored.value = v; state.values.set(f.id, v); buildMemory();
+      };
+      human.addEventListener('input', sync); sync();
+      wrap.append(human, stored);
+      const hint = h('div',{class:'help'}, f.id==='mfi_load' ? 'Enter kg. Stored as grams/10.' : 'Enter g/10min. Stored as value×10.');
+      const box = h('div'); box.append(wrap, hint); return box;
+    }
+    if (f.type === 'int' && f.id === 'density'){
+      const wrap = h('div', {class:'row'});
+      const gcm3 = h('input', {type:'number', min:0, step:'0.001', placeholder:'1.240 (g/cm³)'});
+      const stored = h('input', {type:'number', readonly:true});
+      const sync=()=>{ const ug = Math.round(parseFloat(gcm3.value||'0')*1000); stored.value = ug; state.values.set(f.id, ug); buildMemory(); };
+      gcm3.addEventListener('input', sync); sync();
+      wrap.append(gcm3, stored);
+      const hint = h('div',{class:'help'}, 'Enter g/cm³. Stored as µg/cm³ (×1000).');
+      const box = h('div'); box.append(wrap, hint); return box;
+    }
+    if (f.type === 'int' && f.length === 2){
+      const inp = h('input',{id:f.id,type:'number',min:0,step:'1',placeholder:(f.examples?.[0]??'')});
+      inp.addEventListener('input', ()=> { state.values.set(f.id, Math.round(parseFloat(inp.value||'0'))); buildMemory(); });
+      return inp;
+    }
+    if (f.type === 'int' && f.length === 1){
+      const inp = h('input',{id:f.id,type:'number',min:0,max:255,step:'1',placeholder:(f.examples?.[0]??'')});
+      inp.addEventListener('input', ()=> { state.values.set(f.id, Math.round(parseFloat(inp.value||'0'))); buildMemory(); });
+      return inp;
+    }
+    if (f.type === 'int[4]' && f.id === 'mfg_date'){
+      const inp = h('input', {type:'date'});
+      const sync = ()=>{ state.values.set(f.id, inp.value); buildMemory(); };
+      inp.addEventListener('input', sync); sync();
+      return inp;
+    }
+    if (f.type === 'int[3]' && f.id === 'mfg_time'){
+      const inp = h('input', {type:'time', step:1});
+      const sync = ()=>{ state.values.set(f.id, inp.value); buildMemory(); };
+      inp.addEventListener('input', sync); sync();
+      return inp;
+    }
+
+    // Fallback integer/text
+    const inp = h('input',{id:f.id,type:'text',placeholder:(f.examples?.[0]??'')});
+    inp.addEventListener('input', ()=> { state.values.set(f.id, inp.value); buildMemory(); });
+    return inp;
+  }
+
+  // --- Building ---
+  function addrRangeForTag(tag){
+    const bytes = TAG_CAP[tag];
+    const start = parseHex(SPEC.core.address_range.start); // 0x10
+    const end = start + bytes - 1;
+    return [start, end];
+  }
+
+  function hexdump(buf, startAddr){
+    const lines = [];
+    for (let i=0;i<buf.length;i+=16){
+      const addr = startAddr + i;
+      const slice = buf.subarray(i, i+16);
+      const hexs = [...slice].map(b=>hex(b)).join(' ');
+      const ascii = [...slice].map(b=> (b>=32 && b<=126)? String.fromCharCode(b): '.').join('');
+      lines.push(`${addrHex(addr)}  ${hexs.padEnd(16*3-1,' ')}  |${ascii}|`);
+    }
+    return lines.join('\n');
+  }
+
+  function buildMemory(){
+    const [start, end] = addrRangeForTag(state.tagType);
+    const size = end - start + 1;
+    const buf = new Uint8Array(size); buf.fill(0x00);
+
+    const fields = [ ...SPEC.core.fields.map(f=>({set:'core',...f})) ];
+    if (state.tagType !== 'NTAG213' && SPEC.extended) fields.push(...SPEC.extended.fields.map(f=>({set:'extended',...f})));
+
+    const rows = [];
+    const be = true; // big-endian storage for multi-byte ints
+    const push = (f, addr, bytes, note='')=>{
+      const offset = addr - start;
+      if (offset < 0 || (offset + bytes.length) > buf.length){
+        rows.push([f.name, addrHex(addr), f.length, '-', `Out of range for ${state.tagType}`]);
+        return;
+      }
+      buf.set(bytes, offset);
+      rows.push([f.name, addrHex(addr), bytes.length, [...bytes].map(b=>hex(b)).join(' '), note]);
+    };
+
+    for (const f of fields){
+      if (f.type === '-') continue;
+      const addr = parseHex(f.start);
+      const val = state.values.get(f.id);
+      try{
+        if (f.type === 'ascii'){
+          const s = (f.const ?? (val ?? ''))+''; push(f, addr, encodeAscii(s, f.length));
+        } else if (f.type === 'utf8'){
+          push(f, addr, encodeUtf8((val ?? '')+'', f.length));
+        } else if (f.type === 'rgba'){
+          const rgba = Array.isArray(val)? val : [255,255,255,255];
+          push(f, addr, new Uint8Array(rgba.slice(0,4)));
+        } else if (f.type === 'int' && f.id === 'tag_version'){
+          const num = state.values.get('tag_version') ?? Math.round(parseFloat(SPEC.version||'0')*1000);
+          push(f, addr, packInt(num, f.length, be), `version ${SPEC.version ?? '—'}`);
+        } else if (f.type === 'int' && f.id === 'density'){
+          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === 'int' && typeof f.scaling === 'number'){
+          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === 'int' && (f.length===1 || f.length===2)){
+          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === 'int[4]' && f.id === 'mfg_date'){
+          const d = (val||'').split('-');
+          let y=0,m=0,dd=0; if (d.length===3){ y=+d[0]; m=+d[1]; dd=+d[2]; }
+          const bytes = new Uint8Array([ ...packInt(y,2,be), m&0xFF, dd&0xFF ]);
+          push(f, addr, bytes);
+        } else if (f.type === 'int[3]' && f.id === 'mfg_time'){
+          const t = (val||'00:00:00').split(':');
+          let hh=0,mm=0,ss=0; if (t.length>=2){ hh=+t[0]; mm=+t[1]; ss=+((t[2]||'0').split('.')[0]); }
+          const bytes = new Uint8Array([hh&0xFF, mm&0xFF, ss&0xFF]);
+          push(f, addr, bytes);
+        } else {
+          if (typeof val === 'number') push(f, addr, packInt(val, f.length, be));
+          else push(f, addr, encodeUtf8(String(val||''), f.length));
+        }
+      }catch(e){
+        rows.push([f.name, addrHex(addr), f.length, '-', `Error: ${e.message}`]);
+      }
+    }
+
+    // Update hexdump
+    document.getElementById('hexdump').textContent = hexdump(buf, start);
+
+    // Enable exports
+    const enable = id => document.getElementById(id).disabled = false;
+    enable('downloadBin'); enable('downloadMap'); enable('copyHex'); enable('downloadFlipper');
+    if ('NDEFReader' in window) enable('writeWebNFC');
+
+    // Wire export actions (fresh closures)
+    document.getElementById('downloadBin').onclick = ()=> downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
+    document.getElementById('downloadMap').onclick = ()=> downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
+    document.getElementById('copyHex').onclick = ()=> { navigator.clipboard.writeText(document.getElementById('hexdump').textContent); msg('Hex dump copied'); };
+    document.getElementById('downloadFlipper').onclick = ()=> downloadFlipperNfc(buf, start, state.tagType);
+    document.getElementById('writeWebNFC').onclick = ()=> writeViaWebNFC(buf, state.tagType).catch(e=> msg('Web NFC error: '+e.message, true));
+
+    return {buf, rows, start};
+  }
+
+  function downloadBin(buf, name){
+    const blob = new Blob([buf], {type:'application/octet-stream'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  }
+  function downloadMap(rows, name){
+    const head = ['Field','Address','Length','Bytes','Notes'];
+    const csv = [head.join(',')].concat(rows.map(r=> r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(','))).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  }
+
+  function msg(s, isErr=false){
+    const m = document.getElementById('messages');
+    m.textContent = s; m.style.color = isErr? '#ff6b6b' : 'var(--muted)';
+    if (!isErr) setTimeout(()=>{ m.textContent = ''; }, 2500);
+  }
+
+  // --- Web NFC export (NDEF) ---
+  async function writeViaWebNFC(buf, tagType){
+    if (!('NDEFReader' in window)) throw new Error('Web NFC not supported in this browser');
+    const reader = new NDEFReader();
+    await reader.write({
+      records: [
+        { recordType: 'mime', mediaType: 'application/vnd.opentag3d.bin', data: buf },
+        { recordType: 'text', data: `OpenTag3D ${tagType} user-memory dump starting at 0x10` }
+      ]
+    });
+    msg('Wrote NDEF payload to tag');
+  }
+
+  // --- Flipper Zero export (.nfc minimal dump of user pages) ---
+  function downloadFlipperNfc(buf, startAddr, tagType){
+    const header = [
+      'Filetype: Flipper NFC device',
+      'Version: 4',
+      'Device type: NTAG',
+      `Comment: OpenTag3D ${tagType} user memory dump (0x10..)`
+    ];
+    // Build page-aligned dump for user area only (each page = 4 bytes)
+    const lines = [];
+    for (let off=0; off<buf.length; off+=4){
+      const page = (startAddr + off) & 0xFF; // lower byte for display
+      const slice = buf.subarray(off, off+4);
+      const b = [...slice].map(x=>hex(x)).join(' ');
+      lines.push(`Page ${hex(page,2)}: ${b}`);
+    }
+    const content = header.concat(lines).join('\n') + '\n';
+    const blob = new Blob([content], {type:'text/plain'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `opentag_${tagType.toLowerCase()}.nfc`; a.click();
+    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  }
+
+  // --- Simple built-in tests ---
+  function runTests(){
+    const results = [];
+    const assert = (name, cond) => results.push(`${cond? '✅':'❌'} ${name}`);
+
+    // Temperature scaling
+    (function(){
+      const f = {id:'print_temp', type:'int', length:1, scaling:5};
+      state.values.set('print_temp', Math.round(210/5));
+      assert('210°C → 42', state.values.get('print_temp') === 42);
+    })();
+    (function(){
+      const f = {id:'bed_temp', type:'int', length:1, scaling:5};
+      state.values.set('bed_temp', Math.round(60/5));
+      assert('60°C → 12', state.values.get('bed_temp') === 12);
+    })();
+
+    // Diameter and density
+    state.values.set('target_diameter', 1750);
+    assert('1.750 mm → 1750 µm', state.values.get('target_diameter') === 1750);
+    state.values.set('density', 1240);
+    assert('1.240 g/cm³ → 1240 µg/cm³', state.values.get('density') === 1240);
+
+    // Buffer size by tag type
+    state.tagType = 'NTAG213'; let r = buildMemory(); assert('NTAG213 size', r.buf.length === TAG_CAP.NTAG213);
+    state.tagType = 'NTAG215'; r = buildMemory(); assert('NTAG215 size', r.buf.length === TAG_CAP.NTAG215);
+    state.tagType = 'NTAG216'; r = buildMemory(); assert('NTAG216 size', r.buf.length === TAG_CAP.NTAG216);
+
+    document.getElementById('messages').textContent = results.join('  |  ');
+  }
+
+  // --- Init ---
+  window.addEventListener('DOMContentLoaded', ()=>{
+    renderForm();
+    buildMemory();
+
+    document.getElementById('tagType').addEventListener('change', (e)=>{ state.tagType = e.target.value; buildMemory(); });
+
+    document.getElementById('exampleBtn').addEventListener('click', ()=>{
+      const setIf = (id,v)=>{ const el = document.getElementById(id); if (!el) return; el.value = v; el.dispatchEvent(new Event('input', {bubbles:true})); };
+      setIf('manufacturer','Polar Filament');
+      setIf('material_base','PLA');
+      setIf('material_mod','CF');
+      setIf('color_name','Deep Ocean Blue');
+      const rgb = document.getElementById('color_rgb'); if (rgb) rgb.value = '#1E90FF';
+      const al = document.getElementById('color_a'); if (al) al.value = 255;
+      const pt = document.getElementById('print_temp'); if (pt) pt.parentElement.querySelector('input[type="number"]').value = 210; pt.dispatchEvent(new Event('input', {bubbles:true}));
+      const bt = document.getElementById('bed_temp'); if (bt) bt.parentElement.querySelector('input[type="number"]').value = 60; bt.dispatchEvent(new Event('input', {bubbles:true}));
+      const td = document.getElementById('target_diameter'); if (td) td.parentElement.querySelector('input[type="number"]').value = 1.75; td.dispatchEvent(new Event('input', {bubbles:true}));
+      setIf('target_weight',1000);
+      setIf('online_data_url','pfil.us?i=8078-RQSR');
+      const d = document.getElementById('mfg_date'); if (d) d.value = new Date().toISOString().slice(0,10), d.dispatchEvent(new Event('input',{bubbles:true}));
+      const t = document.getElementById('mfg_time'); if (t) t.value = new Date().toISOString().slice(11,19), t.dispatchEvent(new Event('input',{bubbles:true}));
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', ()=>{ renderForm(); buildMemory(); });
+  });
+</script>
