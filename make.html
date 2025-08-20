@@ -340,7 +340,6 @@ layout: single
     if (f.id === "tag_version") {
       const v = SPEC.version;
       const numeric = Math.round(parseFloat(v) * 1000) || 0;
-      const wrap = h("div", { class: "row" });
       const vis = h("input", {
         id: f.id + "_vis",
         type: "text",
@@ -354,14 +353,13 @@ layout: single
         disabled: true,
       });
       state.values.set(f.id, numeric);
-      wrap.append(vis, stored);
       const hint = h(
         "div",
         { class: "help" },
         `Stored as integer with 3 implied decimals → ${numeric}`,
       );
       const box = h("div");
-      box.append(wrap, hint);
+      box.append(vis, hint);
       return box;
     }
 
@@ -393,7 +391,7 @@ layout: single
         step: 1,
         value: 255,
       });
-      const out = h("input", { type: "text", id: f.id, readonly: true });
+      const out = h("input", { type: "hidden", id: f.id, readonly: true });
       const update = () => {
         const rgba = rgbaFromHex(color.value, parseInt(alpha.value || "255", 10));
         out.value = `[${rgba.join(",")}]`;
@@ -410,7 +408,6 @@ layout: single
     }
     // XXX Simplify the following code
     if (f.type === "int" && f.id === "target_diameter") {
-      const wrap = h("div", { class: "row" });
       const mm = h("input", {
         id: f.id,
         type: "number",
@@ -418,23 +415,20 @@ layout: single
         step: "0.001",
         placeholder: "1.750 (mm)",
       });
-      const stored = h("input", { type: "number", readonly: true });
       const sync = () => {
         const um = Math.round(parseFloat(mm.value || "0") * 1000);
-        stored.value = um;
         state.values.set(f.id, um);
         buildMemory();
       };
       mm.addEventListener("input", sync);
       sync();
-      wrap.append(mm, stored);
       const hint = h(
         "div",
         { class: "help" },
         "Enter mm. Stored as µm integer (×1000).",
       );
       const box = h("div");
-      box.append(wrap, hint);
+      box.append(mm, hint);
       return box;
     }
     if (
@@ -448,7 +442,6 @@ layout: single
         "max_print_temp",
       ].includes(f.id)
     ) {
-      const wrap = h("div", { class: "row" });
       const c = h("input", {
         id: f.id,
         type: "number",
@@ -456,47 +449,40 @@ layout: single
         step: 5,
         placeholder: "210 (°C)",
       });
-      const stored = h("input", { type: "number", readonly: true });
       const scale = f.scaling || 5;
       const sync = () => {
         const v = Math.round(parseFloat(c.value || "0") / scale);
-        stored.value = v;
         state.values.set(f.id, v);
         buildMemory();
       };
       c.addEventListener("input", sync);
       sync();
-      wrap.append(c, stored);
       const hint = h(
         "div",
         { class: "help" },
         `Enter °C. Stored as value/\u200B${scale}. Example: 210→${Math.round(210 / scale)}.`,
       );
       const box = h("div");
-      box.append(wrap, hint);
+      box.append(c, hint);
       return box;
     }
     if (f.type === "int" && ["mfi_load", "mfi_value"].includes(f.id)) {
-      const wrap = h("div", { class: "row" });
-      const human = h("input", {
+      const mfi = h("input", {
         id: f.id,
         type: "number",
         min: 0,
         step: "0.1",
         placeholder: f.id === "mfi_load" ? "2.16 (kg)" : "6.3",
       });
-      const stored = h("input", { type: "number", readonly: true });
       const sync = () => {
-        let val = parseFloat(human.value || "0");
+        let val = parseFloat(mfi.value || "0");
         if (f.id === "mfi_load") val = val * 1000; // kg→g before /10
         const v = Math.round(val / 10);
-        stored.value = v;
         state.values.set(f.id, v);
         buildMemory();
       };
-      human.addEventListener("input", sync);
+      mfi.addEventListener("input", sync);
       sync();
-      wrap.append(human, stored);
       const hint = h(
         "div",
         { class: "help" },
@@ -505,11 +491,10 @@ layout: single
           : "Enter g/10min. Stored as value×10.",
       );
       const box = h("div");
-      box.append(wrap, hint);
+      box.append(mfi, hint);
       return box;
     }
     if (f.type === "int" && f.id === "density") {
-      const wrap = h("div", { class: "row" });
       const gcm3 = h("input", {
         id: f.id,
         type: "number",
@@ -517,23 +502,20 @@ layout: single
         step: "0.001",
         placeholder: "1.240 (g/cm³)",
       });
-      const stored = h("input", { type: "number", readonly: true });
       const sync = () => {
         const ug = Math.round(parseFloat(gcm3.value || "0") * 1000);
-        stored.value = ug;
         state.values.set(f.id, ug);
         buildMemory();
       };
       gcm3.addEventListener("input", sync);
       sync();
-      wrap.append(gcm3, stored);
       const hint = h(
         "div",
         { class: "help" },
         "Enter g/cm³. Stored as µg/cm³ (×1000).",
       );
       const box = h("div");
-      box.append(wrap, hint);
+      box.append(gcm3, hint);
       return box;
     }
     if (f.type === "int" && f.length === 2) {
