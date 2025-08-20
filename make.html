@@ -56,6 +56,9 @@ layout: single
     font-style: italic;
     color: rgb(127, 127, 127);
   }
+  input[type="color"] {
+    height: 45px;
+  }
   .row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -165,13 +168,17 @@ layout: single
     <button class="btn" id="downloadFlipper" disabled>
       Download Flipper .nfc
     </button>
-    <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn" id="downloadMap" disabled>
       Download address map (.csv)
     </button>
-    <button class="btn btn--warning" id="copyHex" disabled>
-      Copy hex dump
-    </button>
+    <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
+    <button class="btn btn--warning" id="loadFileBtn">Load File</button>
+    <input
+      type="file"
+      id="uploadFile"
+      accept=".bin,.nfc,.txt,.hex"
+      style="display: none"
+    />
   </div>
   <div id="messages" class="help">
     <br />
@@ -208,433 +215,978 @@ layout: single
 </main>
 
 <script>
+  /* prettier-ignore-start */
+
   // Spec comes from site.data.spec (Jekyll).
   const SPEC = {{site.data.spec | jsonify}};
+
+  /* prettier-ignore-end */
 
   // Known tag capacities (user memory) in bytes
   const TAG_CAP = {
     NTAG213: 144, // 0x10..0x9F
     NTAG215: 504, // 0x10..0x207
-    NTAG216: 888  // 0x10..0x387
+    NTAG216: 888, // 0x10..0x387
   };
 
   const state = {
     values: new Map(),
-    tagType: 'NTAG213'
+    tagType: "NTAG213",
   };
 
   // --- Utils ---
-  const h = (tag, attrs={}, ...kids) => {
+  const h = (tag, attrs = {}, ...kids) => {
     const el = document.createElement(tag);
-    for (const [k,v] of Object.entries(attrs)){
-      if (k === 'class') el.className = v; else if (k === 'for') el.htmlFor = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k,v);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") el.className = v;
+      else if (k === "for") el.htmlFor = v;
+      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v);
     }
     for (const k of kids) el.append(k);
     return el;
   };
-  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-  const hex = (n,w=2)=>Number(n).toString(16).toUpperCase().padStart(w,'0');
-  const addrHex = a => '0x'+hex(a);
-  const parseHex = s => (typeof s === 'number')? s : parseInt(s,16);
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  const hex = (n, w = 2) => Number(n).toString(16).toUpperCase().padStart(w, "0");
+  const addrHex = (a) => "0x" + hex(a);
+  const parseHex = (s) => (typeof s === "number" ? s : parseInt(s, 16));
   const textEncoder = new TextEncoder();
 
-  function packInt(n, len, be=true){
-    n = Math.floor(n||0);
+  function packInt(n, len, be = true) {
+    n = Math.floor(n || 0);
     const b = new Uint8Array(len);
-    for (let i=0;i<len;i++){
-      const shift = be ? (len-1-i) : i;
-      b[i] = (n >> (8*shift)) & 0xFF;
+    for (let i = 0; i < len; i++) {
+      const shift = be ? len - 1 - i : i;
+      b[i] = (n >> (8 * shift)) & 0xff;
     }
     return b;
   }
-  function encodeAscii(str, len){
+  function encodeAscii(str, len) {
     const out = new Uint8Array(len);
-    const s = String(str||'');
-    for (let i=0;i<Math.min(len, s.length); i++){
+    const s = String(str || "");
+    for (let i = 0; i < Math.min(len, s.length); i++) {
       const code = s.charCodeAt(i);
-      if (code>0x7F) throw new Error('Non-ASCII character detected');
+      if (code > 0x7f) throw new Error("Non-ASCII character detected");
       out[i] = code;
     }
     return out;
   }
-  function encodeUtf8(str, len){
-    const enc = textEncoder.encode(String(str||''));
+  function encodeUtf8(str, len) {
+    const enc = textEncoder.encode(String(str || ""));
     const out = new Uint8Array(len);
     out.set(enc.subarray(0, len));
     return out;
   }
-  function rgbaFromHex(hexStr, alpha){
-    const v = String(hexStr||'#000000').replace('#','');
-    return [parseInt(v.slice(0,2)||'00',16), parseInt(v.slice(2,4)||'00',16), parseInt(v.slice(4,6)||'00',16), clamp(Math.round(alpha||255),0,255)];
+  function rgbaFromHex(hexStr, alpha) {
+    const v = String(hexStr || "#000000").replace("#", "");
+    return [
+      parseInt(v.slice(0, 2) || "00", 16),
+      parseInt(v.slice(2, 4) || "00", 16),
+      parseInt(v.slice(4, 6) || "00", 16),
+      clamp(Math.round(alpha || 255), 0, 255),
+    ];
   }
 
   // --- Rendering ---
-  function renderForm(){
-    const host = document.getElementById('formHost');
-    host.innerHTML = '';
+  function renderForm() {
+    const host = document.getElementById("formHost");
+    host.innerHTML = "";
 
     const sections = [
-      {id:'core', title:'Core fields (fit on NTAG213+)'},
-      {id:'extended', title:'Extended fields (NTAG215/216)'}
+      { id: "core", title: "Core fields (fit on NTAG213+)" },
+      { id: "extended", title: "Extended fields (NTAG215/216)" },
     ];
 
-    for (const sec of sections){
+    for (const sec of sections) {
       const def = SPEC[sec.id];
       if (!def) continue;
-      const box = h('div', {class:`grid section-${sec.id}`});
-      host.append(h('h3', {class:`muted section-${sec.id}`}, sec.title));
-      for (const f of def.fields){
-        if (f.type === '-') continue; // skip reserved blocks from UI
-        const row = h('div', {class:'field-row'});
-        const left = h('div');
-        left.append(h('label', {}, `${f.name}`));
+      const box = h("div", { class: `grid section-${sec.id}` });
+      host.append(h("h3", { class: `muted section-${sec.id}` }, sec.title));
+      for (const f of def.fields) {
+        if (f.type === "-") continue; // skip reserved blocks from UI
+        const row = h("div", { class: "field-row" });
+        const left = h("div");
+        left.append(h("label", {}, `${f.name}`));
         left.append(renderInputForField(f));
         row.append(left);
-        const meta = h('div', {class:'help'},
-          h('span', {class:'chip mono'}, `id:${f.id}`),
-          h('span', {class:'chip mono'}, `addr:${f.start}`),
-          h('span', {class:'chip mono'}, `len:${f.length}`),
-          f.unit? h('span', {class:'chip'}, f.unit):'',
-          f.scaling? h('span', {class:'chip'}, `scaling:${f.scaling}`):''
+        const meta = h(
+          "div",
+          { class: "help" },
+          h("span", { class: "chip mono" }, `id:${f.id}`),
+          h("span", { class: "chip mono" }, `addr:${f.start}`),
+          h("span", { class: "chip mono" }, `len:${f.length}`),
+          f.unit ? h("span", { class: "chip" }, f.unit) : "",
+          f.scaling ? h("span", { class: "chip" }, `scaling:${f.scaling}`) : "",
         );
         row.append(meta);
-        if (f.description){ row.append(h('div',{class:'help'}, f.description)); }
+        if (f.description) {
+          row.append(h("div", { class: "help" }, f.description));
+        }
         box.append(row);
       }
       host.append(box);
     }
   }
 
-  function renderInputForField(f){
+  function renderInputForField(f) {
     // Tag format constant
-    if (f.id === 'tag_format'){
-      const inp = h('input', {id:f.id, value: (f.const??'OT'), disabled:true});
-      state.values.set(f.id, f.const??'OT');
+    if (f.id === "tag_format") {
+      const inp = h("input", {
+        id: f.id,
+        value: f.const ?? "OT",
+        disabled: true,
+      });
+      state.values.set(f.id, f.const ?? "OT");
       return inp;
     }
     // Version as fixed integer (3 implied decimals)
-    if (f.id === 'tag_version'){
+    if (f.id === "tag_version") {
       const v = SPEC.version;
-      const numeric = Math.round(parseFloat(v)*1000)||0;
-      const wrap = h('div', {class:'row'});
-      const vis = h('input', {id:f.id+'_vis', type:'text', value: v, disabled:true});
-      const stored = h('input', {id:f.id, type:'number', value:String(numeric), disabled:true});
+      const numeric = Math.round(parseFloat(v) * 1000) || 0;
+      const wrap = h("div", { class: "row" });
+      const vis = h("input", {
+        id: f.id + "_vis",
+        type: "text",
+        value: v,
+        disabled: true,
+      });
+      const stored = h("input", {
+        id: f.id,
+        type: "number",
+        value: String(numeric),
+        disabled: true,
+      });
       state.values.set(f.id, numeric);
       wrap.append(vis, stored);
-      const hint = h('div', {class:'help'}, `Stored as integer with 3 implied decimals → ${numeric}`);
-      const box = h('div'); box.append(wrap, hint); return box;
+      const hint = h(
+        "div",
+        { class: "help" },
+        `Stored as integer with 3 implied decimals → ${numeric}`,
+      );
+      const box = h("div");
+      box.append(wrap, hint);
+      return box;
     }
 
     // Generic by type
-    if (f.type === 'ascii' || f.type === 'utf8'){
-      const inp = h('input', {id:f.id, type:'text', placeholder:(f.examples?.[0]||'')});
-      inp.addEventListener('input', ()=> { state.values.set(f.id, inp.value); buildMemory(); });
+    if (f.type === "ascii" || f.type === "utf8") {
+      const inp = h("input", {
+        id: f.id,
+        type: "text",
+        placeholder: f.examples?.[0] || "",
+      });
+      inp.addEventListener("input", () => {
+        state.values.set(f.id, inp.value);
+        buildMemory();
+      });
       return inp;
     }
-    if (f.type === 'rgba'){
-      const row = h('div', {class:'row'});
-      const color = h('input', {type:'color', id:f.id+'_rgb', value:'#FFA64D'});
-      const alpha = h('input', {type:'number', id:f.id+'_a', min:0, max:255, step:1, value:255});
-      const out = h('input', {type:'text', id:f.id, readonly:true});
-      const update = ()=>{
-        const rgba = rgbaFromHex(color.value, parseInt(alpha.value||'255',10));
-        out.value = `[${rgba.join(',')}]`;
+    if (f.type === "rgba") {
+      const row = h("div", { class: "row" });
+      const color = h("input", {
+        type: "color",
+        id: f.id + "_rgb",
+        value: "#FFA64D",
+      });
+      const alpha = h("input", {
+        type: "number",
+        id: f.id + "_a",
+        min: 0,
+        max: 255,
+        step: 1,
+        value: 255,
+      });
+      const out = h("input", { type: "text", id: f.id, readonly: true });
+      const update = () => {
+        const rgba = rgbaFromHex(color.value, parseInt(alpha.value || "255", 10));
+        out.value = `[${rgba.join(",")}]`;
         state.values.set(f.id, rgba);
         buildMemory();
       };
-      color.addEventListener('input', update);
-      alpha.addEventListener('input', update);
+      color.addEventListener("input", update);
+      alpha.addEventListener("input", update);
       update();
       row.append(color, alpha);
-      const box = h('div'); box.append(row, out); return box;
+      const box = h("div");
+      box.append(row, out);
+      return box;
     }
-    if (f.type === 'int' && f.id === 'target_diameter'){
-      const wrap = h('div', {class:'row'});
-      const mm = h('input', {type:'number', min:0, step:'0.001', placeholder:'1.750 (mm)'});
-      const stored = h('input', {type:'number', readonly:true});
-      const sync=()=>{ const um = Math.round(parseFloat(mm.value||'0')*1000); stored.value = um; state.values.set(f.id, um); buildMemory(); };
-      mm.addEventListener('input', sync); sync();
-      wrap.append(mm, stored);
-      const hint = h('div',{class:'help'}, 'Enter mm. Stored as µm integer (×1000).');
-      const box = h('div'); box.append(wrap, hint); return box;
-    }
-    if (f.type === 'int' && ['print_temp','bed_temp','mfi_temp','max_dry_temp','min_print_temp','max_print_temp'].includes(f.id)){
-      const wrap = h('div', {class:'row'});
-      const c = h('input', {type:'number', min:0, step:'1', placeholder:'210 (°C)'});
-      const stored = h('input', {type:'number', readonly:true});
-      const scale = f.scaling || 5;
-      const sync = ()=>{ const v = Math.round(parseFloat(c.value||'0')/scale); stored.value = v; state.values.set(f.id, v); buildMemory(); };
-      c.addEventListener('input', sync); sync();
-      wrap.append(c, stored);
-      const hint = h('div',{class:'help'}, `Enter °C. Stored as value/\u200B${scale}. Example: 210→${Math.round(210/scale)}.`);
-      const box = h('div'); box.append(wrap, hint); return box;
-    }
-    if (f.type === 'int' && ['mfi_load','mfi_value'].includes(f.id)){
-      const wrap = h('div', {class:'row'});
-      const human = h('input', {type:'number', min:0, step:'0.1', placeholder: f.id==='mfi_load' ? '2.16 (kg)' : '6.3'});
-      const stored = h('input', {type:'number', readonly:true});
-      const sync = ()=>{
-        let val = parseFloat(human.value||'0');
-        if (f.id==='mfi_load') val = val*1000; // kg→g before /10
-        const v = Math.round(val/10);
-        stored.value = v; state.values.set(f.id, v); buildMemory();
+    if (f.type === "int" && f.id === "target_diameter") {
+      const wrap = h("div", { class: "row" });
+      const mm = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        step: "0.001",
+        placeholder: "1.750 (mm)",
+      });
+      const stored = h("input", { type: "number", readonly: true });
+      const sync = () => {
+        const um = Math.round(parseFloat(mm.value || "0") * 1000);
+        stored.value = um;
+        state.values.set(f.id, um);
+        buildMemory();
       };
-      human.addEventListener('input', sync); sync();
+      mm.addEventListener("input", sync);
+      sync();
+      wrap.append(mm, stored);
+      const hint = h(
+        "div",
+        { class: "help" },
+        "Enter mm. Stored as µm integer (×1000).",
+      );
+      const box = h("div");
+      box.append(wrap, hint);
+      return box;
+    }
+    if (
+      f.type === "int" &&
+      [
+        "print_temp",
+        "bed_temp",
+        "mfi_temp",
+        "max_dry_temp",
+        "min_print_temp",
+        "max_print_temp",
+      ].includes(f.id)
+    ) {
+      const wrap = h("div", { class: "row" });
+      const c = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        step: "1",
+        placeholder: "210 (°C)",
+      });
+      const stored = h("input", { type: "number", readonly: true });
+      const scale = f.scaling || 5;
+      const sync = () => {
+        const v = Math.round(parseFloat(c.value || "0") / scale);
+        stored.value = v;
+        state.values.set(f.id, v);
+        buildMemory();
+      };
+      c.addEventListener("input", sync);
+      sync();
+      wrap.append(c, stored);
+      const hint = h(
+        "div",
+        { class: "help" },
+        `Enter °C. Stored as value/\u200B${scale}. Example: 210→${Math.round(210 / scale)}.`,
+      );
+      const box = h("div");
+      box.append(wrap, hint);
+      return box;
+    }
+    if (f.type === "int" && ["mfi_load", "mfi_value"].includes(f.id)) {
+      const wrap = h("div", { class: "row" });
+      const human = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        step: "0.1",
+        placeholder: f.id === "mfi_load" ? "2.16 (kg)" : "6.3",
+      });
+      const stored = h("input", { type: "number", readonly: true });
+      const sync = () => {
+        let val = parseFloat(human.value || "0");
+        if (f.id === "mfi_load") val = val * 1000; // kg→g before /10
+        const v = Math.round(val / 10);
+        stored.value = v;
+        state.values.set(f.id, v);
+        buildMemory();
+      };
+      human.addEventListener("input", sync);
+      sync();
       wrap.append(human, stored);
-      const hint = h('div',{class:'help'}, f.id==='mfi_load' ? 'Enter kg. Stored as grams/10.' : 'Enter g/10min. Stored as value×10.');
-      const box = h('div'); box.append(wrap, hint); return box;
+      const hint = h(
+        "div",
+        { class: "help" },
+        f.id === "mfi_load"
+          ? "Enter kg. Stored as grams/10."
+          : "Enter g/10min. Stored as value×10.",
+      );
+      const box = h("div");
+      box.append(wrap, hint);
+      return box;
     }
-    if (f.type === 'int' && f.id === 'density'){
-      const wrap = h('div', {class:'row'});
-      const gcm3 = h('input', {type:'number', min:0, step:'0.001', placeholder:'1.240 (g/cm³)'});
-      const stored = h('input', {type:'number', readonly:true});
-      const sync=()=>{ const ug = Math.round(parseFloat(gcm3.value||'0')*1000); stored.value = ug; state.values.set(f.id, ug); buildMemory(); };
-      gcm3.addEventListener('input', sync); sync();
+    if (f.type === "int" && f.id === "density") {
+      const wrap = h("div", { class: "row" });
+      const gcm3 = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        step: "0.001",
+        placeholder: "1.240 (g/cm³)",
+      });
+      const stored = h("input", { type: "number", readonly: true });
+      const sync = () => {
+        const ug = Math.round(parseFloat(gcm3.value || "0") * 1000);
+        stored.value = ug;
+        state.values.set(f.id, ug);
+        buildMemory();
+      };
+      gcm3.addEventListener("input", sync);
+      sync();
       wrap.append(gcm3, stored);
-      const hint = h('div',{class:'help'}, 'Enter g/cm³. Stored as µg/cm³ (×1000).');
-      const box = h('div'); box.append(wrap, hint); return box;
+      const hint = h(
+        "div",
+        { class: "help" },
+        "Enter g/cm³. Stored as µg/cm³ (×1000).",
+      );
+      const box = h("div");
+      box.append(wrap, hint);
+      return box;
     }
-    if (f.type === 'int' && f.length === 2){
-      const inp = h('input',{id:f.id,type:'number',min:0,step:'1',placeholder:(f.examples?.[0]??'')});
-      inp.addEventListener('input', ()=> { state.values.set(f.id, Math.round(parseFloat(inp.value||'0'))); buildMemory(); });
+    if (f.type === "int" && f.length === 2) {
+      const inp = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        step: "1",
+        placeholder: f.examples?.[0] ?? "",
+      });
+      inp.addEventListener("input", () => {
+        state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
+        buildMemory();
+      });
       return inp;
     }
-    if (f.type === 'int' && f.length === 1){
-      const inp = h('input',{id:f.id,type:'number',min:0,max:255,step:'1',placeholder:(f.examples?.[0]??'')});
-      inp.addEventListener('input', ()=> { state.values.set(f.id, Math.round(parseFloat(inp.value||'0'))); buildMemory(); });
+    if (f.type === "int" && f.length === 1) {
+      const inp = h("input", {
+        id: f.id,
+        type: "number",
+        min: 0,
+        max: 255,
+        step: "1",
+        placeholder: f.examples?.[0] ?? "",
+      });
+      inp.addEventListener("input", () => {
+        state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
+        buildMemory();
+      });
       return inp;
     }
-    if (f.type === 'int[4]' && f.id === 'mfg_date'){
-      const inp = h('input', {type:'date'});
-      const sync = ()=>{ state.values.set(f.id, inp.value); buildMemory(); };
-      inp.addEventListener('input', sync); sync();
+    if (f.type === "int[4]" && f.id === "mfg_date") {
+      const inp = h("input", { id: f.id, type: "date" });
+      const sync = () => {
+        state.values.set(f.id, inp.value);
+        buildMemory();
+      };
+      inp.addEventListener("input", sync);
+      sync();
       return inp;
     }
-    if (f.type === 'int[3]' && f.id === 'mfg_time'){
-      const inp = h('input', {type:'time', step:1});
-      const sync = ()=>{ state.values.set(f.id, inp.value); buildMemory(); };
-      inp.addEventListener('input', sync); sync();
+    if (f.type === "int[3]" && f.id === "mfg_time") {
+      const inp = h("input", { id: f.id, type: "time", step: 1 });
+      const sync = () => {
+        state.values.set(f.id, inp.value);
+        buildMemory();
+      };
+      inp.addEventListener("input", sync);
+      sync();
       return inp;
     }
 
     // Fallback integer/text
-    const inp = h('input',{id:f.id,type:'text',placeholder:(f.examples?.[0]??'')});
-    inp.addEventListener('input', ()=> { state.values.set(f.id, inp.value); buildMemory(); });
+    const inp = h("input", {
+      id: f.id,
+      type: "text",
+      placeholder: f.examples?.[0] ?? "",
+    });
+    inp.addEventListener("input", () => {
+      state.values.set(f.id, inp.value);
+      buildMemory();
+    });
     return inp;
   }
 
   function enableSections() {
-    document.querySelectorAll('.section-extended').forEach(el => el.hidden = state.tagType === 'NTAG213');
+    document
+      .querySelectorAll(".section-extended")
+      .forEach((el) => (el.hidden = state.tagType === "NTAG213"));
   }
 
   // --- Building ---
-  function addrRangeForTag(tag){
+  function addrRangeForTag(tag) {
     const bytes = TAG_CAP[tag];
     const start = parseHex(SPEC.core.address_range.start); // 0x10
     const end = start + bytes - 1;
     return [start, end];
   }
 
-  function hexdump(buf, startAddr){
+  function hexdump(buf, startAddr) {
     const lines = [];
-    for (let i=0;i<buf.length;i+=16){
+    for (let i = 0; i < buf.length; i += 16) {
       const addr = startAddr + i;
-      const slice = buf.subarray(i, i+16);
-      const hexs = [...slice].map(b=>hex(b)).join(' ');
-      const ascii = [...slice].map(b=> (b>=32 && b<=126)? String.fromCharCode(b): '.').join('');
-      lines.push(`${addrHex(addr)}  ${hexs.padEnd(16*3-1,' ')}  |${ascii}|`);
+      const slice = buf.subarray(i, i + 16);
+      const hexs = [...slice].map((b) => hex(b)).join(" ");
+      const ascii = [...slice]
+        .map((b) => (b >= 32 && b <= 126 ? String.fromCharCode(b) : "."))
+        .join("");
+      lines.push(`${addrHex(addr)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`);
     }
-    return lines.join('\n');
+    return lines.join("\n");
   }
 
-  function buildMemory(){
+  function buildMemory() {
     const [start, end] = addrRangeForTag(state.tagType);
     const size = end - start + 1;
-    const buf = new Uint8Array(size); buf.fill(0x00);
+    const buf = new Uint8Array(size);
+    buf.fill(0x00);
 
-    const fields = [ ...SPEC.core.fields.map(f=>({set:'core',...f})) ];
-    if (state.tagType !== 'NTAG213' && SPEC.extended) fields.push(...SPEC.extended.fields.map(f=>({set:'extended',...f})));
+    const fields = [...SPEC.core.fields.map((f) => ({ set: "core", ...f }))];
+    if (state.tagType !== "NTAG213" && SPEC.extended)
+      fields.push(
+        ...SPEC.extended.fields.map((f) => ({ set: "extended", ...f })),
+      );
 
     const rows = [];
     const be = true; // big-endian storage for multi-byte ints
-    const push = (f, addr, bytes, note='')=>{
+    const push = (f, addr, bytes, note = "") => {
       const offset = addr - start;
-      if (offset < 0 || (offset + bytes.length) > buf.length){
-        rows.push([f.name, addrHex(addr), f.length, '-', `Out of range for ${state.tagType}`]);
+      if (offset < 0 || offset + bytes.length > buf.length) {
+        rows.push([
+          f.name,
+          addrHex(addr),
+          f.length,
+          "-",
+          `Out of range for ${state.tagType}`,
+        ]);
         return;
       }
       buf.set(bytes, offset);
-      rows.push([f.name, addrHex(addr), bytes.length, [...bytes].map(b=>hex(b)).join(' '), note]);
+      rows.push([
+        f.name,
+        addrHex(addr),
+        bytes.length,
+        [...bytes].map((b) => hex(b)).join(" "),
+        note,
+      ]);
     };
 
-    for (const f of fields){
-      if (f.type === '-') continue;
+    for (const f of fields) {
+      if (f.type === "-") continue;
       const addr = parseHex(f.start);
       const val = state.values.get(f.id);
-      try{
-        if (f.type === 'ascii'){
-          const s = (f.const ?? (val ?? ''))+''; push(f, addr, encodeAscii(s, f.length));
-        } else if (f.type === 'utf8'){
-          push(f, addr, encodeUtf8((val ?? '')+'', f.length));
-        } else if (f.type === 'rgba'){
-          const rgba = Array.isArray(val)? val : [255,255,255,255];
-          push(f, addr, new Uint8Array(rgba.slice(0,4)));
-        } else if (f.type === 'int' && f.id === 'tag_version'){
-          const num = state.values.get('tag_version') ?? Math.round(parseFloat(SPEC.version||'0')*1000);
-          push(f, addr, packInt(num, f.length, be), `version ${SPEC.version ?? '—'}`);
-        } else if (f.type === 'int' && f.id === 'density'){
-          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === 'int' && typeof f.scaling === 'number'){
-          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === 'int' && (f.length===1 || f.length===2)){
-          const n = Number(val||0); push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === 'int[4]' && f.id === 'mfg_date'){
-          const d = (val||'').split('-');
-          let y=0,m=0,dd=0; if (d.length===3){ y=+d[0]; m=+d[1]; dd=+d[2]; }
-          const bytes = new Uint8Array([ ...packInt(y,2,be), m&0xFF, dd&0xFF ]);
+      try {
+        if (f.type === "ascii") {
+          const s = (f.const ?? val ?? "") + "";
+          push(f, addr, encodeAscii(s, f.length));
+        } else if (f.type === "utf8") {
+          push(f, addr, encodeUtf8((val ?? "") + "", f.length));
+        } else if (f.type === "rgba") {
+          const rgba = Array.isArray(val) ? val : [255, 255, 255, 255];
+          push(f, addr, new Uint8Array(rgba.slice(0, 4)));
+        } else if (f.type === "int" && f.id === "tag_version") {
+          const num =
+            state.values.get("tag_version") ??
+            Math.round(parseFloat(SPEC.version || "0") * 1000);
+          push(
+            f,
+            addr,
+            packInt(num, f.length, be),
+            `version ${SPEC.version ?? "—"}`,
+          );
+        } else if (f.type === "int" && f.id === "density") {
+          const n = Number(val || 0);
+          push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === "int" && typeof f.scaling === "number") {
+          const n = Number(val || 0);
+          push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === "int" && (f.length === 1 || f.length === 2)) {
+          const n = Number(val || 0);
+          push(f, addr, packInt(n, f.length, be));
+        } else if (f.type === "int[4]" && f.id === "mfg_date") {
+          const d = (val || "").split("-");
+          let y = 0,
+            m = 0,
+            dd = 0;
+          if (d.length === 3) {
+            y = +d[0];
+            m = +d[1];
+            dd = +d[2];
+          }
+          const bytes = new Uint8Array([
+            ...packInt(y, 2, be),
+            m & 0xff,
+            dd & 0xff,
+          ]);
           push(f, addr, bytes);
-        } else if (f.type === 'int[3]' && f.id === 'mfg_time'){
-          const t = (val||'00:00:00').split(':');
-          let hh=0,mm=0,ss=0; if (t.length>=2){ hh=+t[0]; mm=+t[1]; ss=+((t[2]||'0').split('.')[0]); }
-          const bytes = new Uint8Array([hh&0xFF, mm&0xFF, ss&0xFF]);
+        } else if (f.type === "int[3]" && f.id === "mfg_time") {
+          const t = (val || "00:00:00").split(":");
+          let hh = 0,
+            mm = 0,
+            ss = 0;
+          if (t.length >= 2) {
+            hh = +t[0];
+            mm = +t[1];
+            ss = +(t[2] || "0").split(".")[0];
+          }
+          const bytes = new Uint8Array([hh & 0xff, mm & 0xff, ss & 0xff]);
           push(f, addr, bytes);
         } else {
-          if (typeof val === 'number') push(f, addr, packInt(val, f.length, be));
-          else push(f, addr, encodeUtf8(String(val||''), f.length));
+          if (typeof val === "number") push(f, addr, packInt(val, f.length, be));
+          else push(f, addr, encodeUtf8(String(val || ""), f.length));
         }
-      }catch(e){
-        rows.push([f.name, addrHex(addr), f.length, '-', `Error: ${e.message}`]);
+      } catch (e) {
+        rows.push([f.name, addrHex(addr), f.length, "-", `Error: ${e.message}`]);
       }
     }
 
     // Update hexdump
-    document.getElementById('hexdump').textContent = hexdump(buf, start);
+    document.getElementById("hexdump").textContent = hexdump(buf, start);
 
     // Enable exports
-    const enable = id => document.getElementById(id).disabled = false;
-    enable('downloadBin'); enable('downloadMap'); enable('copyHex'); enable('downloadFlipper');
-    if ('NDEFReader' in window) enable('writeWebNFC');
+    const enable = (id) => (document.getElementById(id).disabled = false);
+    enable("downloadBin");
+    enable("downloadMap");
+    enable("downloadFlipper");
+    if ("NDEFReader" in window) enable("writeWebNFC");
 
     // Wire export actions (fresh closures)
-    document.getElementById('downloadBin').onclick = ()=> downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
-    document.getElementById('downloadMap').onclick = ()=> downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
-    document.getElementById('copyHex').onclick = ()=> { navigator.clipboard.writeText(document.getElementById('hexdump').textContent); msg('Hex dump copied'); };
-    document.getElementById('downloadFlipper').onclick = ()=> downloadFlipperNfc(buf, start, state.tagType);
-    document.getElementById('writeWebNFC').onclick = ()=> writeViaWebNFC(buf, state.tagType).catch(e=> msg('Web NFC error: '+e.message, true));
+    document.getElementById("downloadBin").onclick = () =>
+      downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
+    document.getElementById("downloadMap").onclick = () =>
+      downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
+    document.getElementById("downloadFlipper").onclick = () =>
+      downloadFlipperNfc(buf, start, state.tagType);
+    document.getElementById("writeWebNFC").onclick = () =>
+      writeViaWebNFC(buf, state.tagType).catch((e) =>
+        msg("Web NFC error: " + e.message, true),
+      );
 
-    return {buf, rows, start};
+    return { buf, rows, start };
   }
 
-  function downloadBin(buf, name){
-    const blob = new Blob([buf], {type:'application/octet-stream'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  function downloadBin(buf, name) {
+    const blob = new Blob([buf], { type: "application/octet-stream" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
-  function downloadMap(rows, name){
-    const head = ['Field','Address','Length','Bytes','Notes'];
-    const csv = [head.join(',')].concat(rows.map(r=> r.map(x=>`"${String(x).replaceAll('"','""')}"`).join(','))).join('\n');
-    const blob = new Blob([csv], {type:'text/csv'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
-    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+  function downloadMap(rows, name) {
+    const head = ["Field", "Address", "Length", "Bytes", "Notes"];
+    const csv = [head.join(",")]
+      .concat(
+        rows.map((r) =>
+          r.map((x) => `"${String(x).replaceAll('"', '""')}"`).join(","),
+        ),
+      )
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
-  function msg(s, isErr=false){
-    const m = document.getElementById('messages');
-    m.textContent = s; m.style.color = isErr? '#ff6b6b' : 'var(--muted)';
-    if (!isErr) setTimeout(()=>{ m.textContent = ''; }, 2500);
+  function msg(s, isErr = false) {
+    const m = document.getElementById("messages");
+    m.textContent = s;
+    m.style.color = isErr ? "#ff6b6b" : "var(--muted)";
+    if (!isErr)
+      setTimeout(() => {
+        m.textContent = "";
+      }, 2500);
   }
 
   // --- Web NFC export (NDEF) ---
-  async function writeViaWebNFC(buf, tagType){
-    if (!('NDEFReader' in window)) throw new Error('Web NFC not supported in this browser');
+  async function writeViaWebNFC(buf, tagType) {
+    if (!("NDEFReader" in window))
+      throw new Error("Web NFC not supported in this browser");
     const reader = new NDEFReader();
     await reader.write({
       records: [
-        { recordType: 'mime', mediaType: 'application/vnd.opentag3d.bin', data: buf },
-        { recordType: 'text', data: `OpenTag3D ${tagType} user-memory dump starting at 0x10` }
-      ]
+        {
+          recordType: "mime",
+          mediaType: "application/vnd.opentag3d.bin",
+          data: buf,
+        },
+        {
+          recordType: "text",
+          data: `OpenTag3D ${tagType} user-memory dump starting at 0x10`,
+        },
+      ],
     });
-    msg('Wrote NDEF payload to tag');
+    msg("Wrote NDEF payload to tag");
   }
 
   // --- Flipper Zero export (.nfc minimal dump of user pages) ---
-  function downloadFlipperNfc(buf, startAddr, tagType){
+  function downloadFlipperNfc(buf, startAddr, tagType) {
     const header = [
-      'Filetype: Flipper NFC device',
-      'Version: 4',
-      'Device type: NTAG',
-      `Comment: OpenTag3D ${tagType} user memory dump (0x10..)`
+      "Filetype: Flipper NFC device",
+      "Version: 4",
+      "Device type: NTAG",
+      `Comment: OpenTag3D ${tagType} user memory dump (0x10..)`,
     ];
     // Build page-aligned dump for user area only (each page = 4 bytes)
     const lines = [];
-    for (let off=0; off<buf.length; off+=4){
-      const page = (startAddr + off) & 0xFF; // lower byte for display
-      const slice = buf.subarray(off, off+4);
-      const b = [...slice].map(x=>hex(x)).join(' ');
-      lines.push(`Page ${hex(page,2)}: ${b}`);
+    for (let off = 0; off < buf.length; off += 4) {
+      const page = (startAddr + off) & 0xff; // lower byte for display
+      const slice = buf.subarray(off, off + 4);
+      const b = [...slice].map((x) => hex(x)).join(" ");
+      lines.push(`Page ${hex(page, 2)}: ${b}`);
     }
-    const content = header.concat(lines).join('\n') + '\n';
-    const blob = new Blob([content], {type:'text/plain'});
-    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `opentag_${tagType.toLowerCase()}.nfc`; a.click();
-    setTimeout(()=> URL.revokeObjectURL(a.href), 1000);
+    const content = header.concat(lines).join("\n") + "\n";
+    const blob = new Blob([content], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `opentag_${tagType.toLowerCase()}.nfc`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  // --- IMPORTERS ---
+
+  // Parse our hexdump lines, Flipper "Page XX:" lines, or plain hex bytes.
+  function parseBytesFromText(text) {
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const byteMap = new Map();
+    let minAddr = Infinity,
+      maxAddr = -Infinity,
+      sawAddressed = false;
+
+    for (const line of lines) {
+      // App hexdump: "0x10  AA BB ... |....|"
+      let m = line.match(
+        /^0x([0-9A-Fa-f]+)\s+((?:[0-9A-Fa-f]{2}\s+){0,15}[0-9A-Fa-f]{2})(?:\s+\|.*)?$/,
+      );
+      if (m) {
+        const base = parseInt(m[1], 16);
+        const bytes = m[2]
+          .trim()
+          .split(/\s+/)
+          .map((h) => parseInt(h, 16));
+        bytes.forEach((b, i) => byteMap.set(base + i, b));
+        minAddr = Math.min(minAddr, base);
+        maxAddr = Math.max(maxAddr, base + bytes.length - 1);
+        sawAddressed = true;
+        continue;
+      }
+      // Flipper: "Page 10: AA BB CC DD"
+      m = line.match(
+        /^Page\s+([0-9A-Fa-f]{2}):\s+((?:[0-9A-Fa-f]{2}\s+){0,3}[0-9A-Fa-f]{2})$/,
+      );
+      if (m) {
+        const page = parseInt(m[1], 16);
+        const base = page * 4; // 4 bytes/page
+        const bytes = m[2]
+          .trim()
+          .split(/\s+/)
+          .map((h) => parseInt(h, 16));
+        bytes.forEach((b, i) => byteMap.set(base + i, b));
+        minAddr = Math.min(minAddr, base);
+        maxAddr = Math.max(maxAddr, base + bytes.length - 1);
+        sawAddressed = true;
+        continue;
+      }
+    }
+
+    if (sawAddressed) {
+      const start = isFinite(minAddr) ? minAddr : 0x10;
+      const out = new Uint8Array(maxAddr - start + 1);
+      out.fill(0);
+      for (let a = minAddr; a <= maxAddr; a++) {
+        const b = byteMap.get(a);
+        if (typeof b === "number") out[a - minAddr] = b;
+      }
+      return { startAddr: start, data: out };
+    }
+
+    // Plain hex bytes
+    const all = text
+      .replace(/[^0-9A-Fa-f]/g, " ")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (all.length) {
+      return {
+        startAddr: 0x10,
+        data: new Uint8Array(all.map((h) => parseInt(h, 16))),
+      };
+    }
+    throw new Error("No recognizable hex format found");
+  }
+
+  // Decode imported buffer back into the form (reverse the human↔stored scalings where we can).
+  function loadBufferIntoForm(buf, startAddr) {
+    document.getElementById("hexdump").textContent = hexdump(buf, startAddr);
+
+    const parseHex = (s) => (typeof s === "number" ? s : parseInt(s, 16));
+    const read = (addr, len) => {
+      const off = addr - startAddr;
+      if (off < 0 || off + len > buf.length) return new Uint8Array(len);
+      return buf.subarray(off, off + len);
+    };
+    const readInt = (bytes) => bytes.reduce((n, b) => (n << 8) | b, 0) >>> 0;
+    const setVal = (id, val) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = val;
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    };
+
+    const allFields = [
+      ...SPEC.core.fields,
+      ...(SPEC.extended ? SPEC.extended.fields : []),
+    ];
+    for (const f of allFields) {
+      if (f.type === "-") continue;
+      const addr = parseHex(f.start);
+      const bytes = read(addr, f.length);
+
+      try {
+        if (f.type === "ascii" || f.type === "utf8") {
+          const s = String.fromCharCode(...bytes).replace(/\u0000+$/, "");
+          setVal(f.id, s);
+        } else if (f.type === "rgba") {
+          const [r = 0, g = 0, b = 0, a = 255] = bytes;
+          const color = document.getElementById(f.id + "_rgb");
+          if (color)
+            color.value =
+              "#" +
+              [r, g, b]
+                .map((x) => x.toString(16).toUpperCase().padStart(2, "0"))
+                .join("");
+          const alpha = document.getElementById(f.id + "_a");
+          if (alpha) alpha.value = a;
+          const out = document.getElementById(f.id);
+          if (out) out.value = `[${r},${g},${b},${a}]`;
+          state.values.set(f.id, [r, g, b, a]);
+        } else if (f.type === "int" && (f.length === 1 || f.length === 2)) {
+          const n = readInt(bytes);
+
+          if (
+            [
+              "print_temp",
+              "bed_temp",
+              "mfi_temp",
+              "max_dry_temp",
+              "min_print_temp",
+              "max_print_temp",
+            ].includes(f.id)
+          ) {
+            const scale = f.scaling || 5;
+            const holder = document.getElementById(f.id);
+            const number = holder?.parentElement?.querySelector(
+              'input[type="number"]',
+            );
+            if (number) {
+              number.value = String(n * scale);
+              number.dispatchEvent(new Event("input", { bubbles: true }));
+            } else {
+              state.values.set(f.id, n);
+            }
+          } else if (f.id === "target_diameter") {
+            const mmEl = document
+              .querySelector("#" + f.id)
+              ?.parentElement?.querySelector('input[type="number"]');
+            if (mmEl) {
+              mmEl.value = String((n / 1000).toFixed(3));
+              mmEl.dispatchEvent(new Event("input", { bubbles: true }));
+            } else {
+              state.values.set(f.id, n);
+            }
+          } else if (f.id === "density") {
+            const gcm3El = document
+              .querySelector("#" + f.id)
+              ?.parentElement?.querySelector('input[type="number"]');
+            if (gcm3El) {
+              gcm3El.value = String((n / 1000).toFixed(3));
+              gcm3El.dispatchEvent(new Event("input", { bubbles: true }));
+            } else {
+              state.values.set(f.id, n);
+            }
+          } else {
+            setVal(f.id, String(n));
+          }
+        } else if (f.type === "int[4]" && f.id === "mfg_date") {
+          const y = (bytes[0] << 8) | bytes[1],
+            m = bytes[2],
+            d = bytes[3];
+          setVal(
+            f.id,
+            `${y.toString().padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
+          );
+        } else if (f.type === "int[3]" && f.id === "mfg_time") {
+          const [hh = 0, mm = 0, ss = 0] = bytes;
+          setVal(
+            f.id,
+            `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}:${String(ss).padStart(2, "0")}`,
+          );
+        }
+      } catch {
+        /* be forgiving on decode */
+      }
+    }
+
+    msg("Imported buffer applied to form");
   }
 
   // --- Simple built-in tests ---
-  function runTests(){
+  function runTests() {
     const results = [];
-    const assert = (name, cond) => results.push(`${cond? '✅':'❌'} ${name}`);
+    const assert = (name, cond) => results.push(`${cond ? "✅" : "❌"} ${name}`);
 
     // Temperature scaling
-    (function(){
-      const f = {id:'print_temp', type:'int', length:1, scaling:5};
-      state.values.set('print_temp', Math.round(210/5));
-      assert('210°C → 42', state.values.get('print_temp') === 42);
+    (function () {
+      const f = { id: "print_temp", type: "int", length: 1, scaling: 5 };
+      state.values.set("print_temp", Math.round(210 / 5));
+      assert("210°C → 42", state.values.get("print_temp") === 42);
     })();
-    (function(){
-      const f = {id:'bed_temp', type:'int', length:1, scaling:5};
-      state.values.set('bed_temp', Math.round(60/5));
-      assert('60°C → 12', state.values.get('bed_temp') === 12);
+    (function () {
+      const f = { id: "bed_temp", type: "int", length: 1, scaling: 5 };
+      state.values.set("bed_temp", Math.round(60 / 5));
+      assert("60°C → 12", state.values.get("bed_temp") === 12);
     })();
 
     // Diameter and density
-    state.values.set('target_diameter', 1750);
-    assert('1.750 mm → 1750 µm', state.values.get('target_diameter') === 1750);
-    state.values.set('density', 1240);
-    assert('1.240 g/cm³ → 1240 µg/cm³', state.values.get('density') === 1240);
+    state.values.set("target_diameter", 1750);
+    assert("1.750 mm → 1750 µm", state.values.get("target_diameter") === 1750);
+    state.values.set("density", 1240);
+    assert("1.240 g/cm³ → 1240 µg/cm³", state.values.get("density") === 1240);
 
     // Buffer size by tag type
-    state.tagType = 'NTAG213'; let r = buildMemory(); assert('NTAG213 size', r.buf.length === TAG_CAP.NTAG213);
-    state.tagType = 'NTAG215'; r = buildMemory(); assert('NTAG215 size', r.buf.length === TAG_CAP.NTAG215);
-    state.tagType = 'NTAG216'; r = buildMemory(); assert('NTAG216 size', r.buf.length === TAG_CAP.NTAG216);
+    state.tagType = "NTAG213";
+    let r = buildMemory();
+    assert("NTAG213 size", r.buf.length === TAG_CAP.NTAG213);
+    state.tagType = "NTAG215";
+    r = buildMemory();
+    assert("NTAG215 size", r.buf.length === TAG_CAP.NTAG215);
+    state.tagType = "NTAG216";
+    r = buildMemory();
+    assert("NTAG216 size", r.buf.length === TAG_CAP.NTAG216);
 
-    document.getElementById('messages').textContent = results.join('  |  ');
+    // Parser tests
+    const sampleHex =
+      "0x10  00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF  |................|\n0x20  01 02 03 04";
+    const parsedA = parseBytesFromText(sampleHex);
+    assert(
+      "Parse app hexdump",
+      parsedA.data.length >= 20 && parsedA.startAddr === 0x10,
+    );
+
+    const sampleFlipper = "Page 10: AA BB CC DD\nPage 11: 01 02 03 04";
+    const parsedB = parseBytesFromText(sampleFlipper);
+    assert(
+      "Parse flipper pages",
+      parsedB.data.length === 8 && parsedB.startAddr === 0x40,
+    );
+
+    const samplePlain = "AA BB CC DD 01 02 03 04";
+    const parsedC = parseBytesFromText(samplePlain);
+    assert(
+      "Parse plain bytes",
+      parsedC.data.length === 8 && parsedC.startAddr === 0x10,
+    );
+
+    document.getElementById("messages").textContent = results.join("  |  ");
   }
 
   // --- Init ---
-  window.addEventListener('DOMContentLoaded', ()=>{
+  window.addEventListener("DOMContentLoaded", () => {
     renderForm();
     enableSections();
     buildMemory();
 
-    document.getElementById('tagType').addEventListener('change', (e)=>{ state.tagType = e.target.value; enableSections(); buildMemory(); });
-
-    document.getElementById('exampleBtn').addEventListener('click', ()=>{
-      const setIf = (id,v)=>{ const el = document.getElementById(id); if (!el) return; el.value = v; el.dispatchEvent(new Event('input', {bubbles:true})); };
-      setIf('manufacturer','Polar Filament');
-      setIf('material_base','PLA');
-      setIf('material_mod','CF');
-      setIf('color_name','Deep Ocean Blue');
-      const rgb = document.getElementById('color_rgb'); if (rgb) rgb.value = '#1E90FF';
-      const al = document.getElementById('color_a'); if (al) al.value = 255;
-      const pt = document.getElementById('print_temp'); if (pt) pt.parentElement.querySelector('input[type="number"]').value = 210; pt.dispatchEvent(new Event('input', {bubbles:true}));
-      const bt = document.getElementById('bed_temp'); if (bt) bt.parentElement.querySelector('input[type="number"]').value = 60; bt.dispatchEvent(new Event('input', {bubbles:true}));
-      const td = document.getElementById('target_diameter'); if (td) td.parentElement.querySelector('input[type="number"]').value = 1.75; td.dispatchEvent(new Event('input', {bubbles:true}));
-      setIf('target_weight',1000);
-      setIf('online_data_url','pfil.us?i=8078-RQSR');
-      const d = document.getElementById('mfg_date'); if (d) d.value = new Date().toISOString().slice(0,10), d.dispatchEvent(new Event('input',{bubbles:true}));
-      const t = document.getElementById('mfg_time'); if (t) t.value = new Date().toISOString().slice(11,19), t.dispatchEvent(new Event('input',{bubbles:true}));
+    document.getElementById("tagType").addEventListener("change", (e) => {
+      state.tagType = e.target.value;
+      enableSections();
+      buildMemory();
     });
 
-    document.getElementById('resetBtn').addEventListener('click', ()=>{ renderForm(); buildMemory(); });
+    document.getElementById("exampleBtn").addEventListener("click", () => {
+      const setIf = (id, v) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = v;
+        el.dispatchEvent(new Event("input", { bubbles: true }));
+      };
+      setIf("manufacturer", "Polar Filament");
+      setIf("material_base", "PLA");
+      setIf("material_mod", "CF");
+      setIf("color_name", "Deep Ocean Blue");
+      const rgb = document.getElementById("color_rgb");
+      if (rgb) {
+        rgb.value = "#1E90FF";
+      }
+      const al = document.getElementById("color_a");
+      if (al) {
+        al.value = 255;
+      }
+      const pt = document.getElementById("print_temp");
+      if (pt) {
+        pt.parentElement.querySelector('input[type="number"]').value = 210;
+        pt.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      const bt = document.getElementById("bed_temp");
+      if (bt) {
+        bt.parentElement.querySelector('input[type="number"]').value = 60;
+        bt.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      const td = document.getElementById("target_diameter");
+      if (td) {
+        td.parentElement.querySelector('input[type="number"]').value = 1.75;
+        td.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      const dn = document.getElementById("target_diameter");
+      if (dn) {
+        dn.parentElement.querySelector('input[type="number"]').value = 1.24;
+        dn.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      setIf("target_weight", 1000);
+      const d = document.getElementById("mfg_date");
+      if (d) {
+        d.value = new Date().toISOString().slice(0, 10);
+        d.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      const t = document.getElementById("mfg_time");
+      if (t) {
+        t.value = new Date().toISOString().slice(11, 19);
+        t.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    });
+
+    // File picker
+    document
+      .getElementById("loadFileBtn")
+      .addEventListener("click", () =>
+        document.getElementById("uploadFile").click(),
+      );
+
+    document
+      .getElementById("uploadFile")
+      .addEventListener("change", async (e) => {
+        const f = e.target.files?.[0];
+        if (!f) return;
+        try {
+          if (f.name.toLowerCase().endsWith(".bin")) {
+            const buf = new Uint8Array(await f.arrayBuffer());
+            loadBufferIntoForm(buf, 0x10); // assume user memory starts at 0x10
+            msg("Loaded .bin (assumed start 0x10)");
+          } else {
+            const text = await f.text();
+            const { startAddr, data } = parseBytesFromText(text);
+            loadBufferIntoForm(data, startAddr);
+            msg(`Loaded dump (start ${addrHex(startAddr)})`);
+          }
+        } catch (err) {
+          msg("Import error: " + err.message, true);
+        } finally {
+          e.target.value = "";
+        }
+      });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      renderForm();
+      buildMemory();
+    });
   });
 </script>
