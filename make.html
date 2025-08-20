@@ -359,13 +359,8 @@ layout: single
         disabled: true,
       });
       state.values.set(f.id, numeric);
-      const hint = h(
-        "div",
-        { class: "help" },
-        `Stored as integer with 3 implied decimals → ${numeric}`,
-      );
       const box = h("div");
-      box.append(vis, hint);
+      box.append(vis);
       return box;
     }
 
