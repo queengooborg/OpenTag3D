@@ -13,17 +13,12 @@ layout: single
   * {
     box-sizing: border-box;
   }
-  .tag {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    color: var(--muted);
-  }
   .card {
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    padding: 16px;
     overflow: hidden;
   }
   .card h2 {
@@ -32,9 +27,6 @@ layout: single
     border-bottom: 1px solid var(--line);
     font-size: 16px;
     color: #cfe0ff;
-  }
-  .pad {
-    padding: 14px 16px;
   }
   label {
     display: block;
@@ -103,11 +95,6 @@ layout: single
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
-  }
-  .mono {
-    font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace;
   }
   .muted {
     color: var(--muted);
@@ -195,24 +182,21 @@ layout: single
   <br />
 
   <section class="card">
-    <h2>Configuration</h2>
     <div class="pad">
-      <div class="row">
-        <div>
-          <label>Tag type</label>
-          <select id="tagType">
-            <option value="NTAG213" selected>NTAG213 (Core)</option>
-            <option value="NTAG215">NTAG215 (Core + Extended)</option>
-            <option value="NTAG216">NTAG216 (Core + Extended)</option>
-          </select>
-          <div class="help">
-            Determines memory size and whether "extended" fields are included.
-          </div>
+      <div>
+        <label>Tag type</label>
+        <select id="tagType">
+          <option value="NTAG213" selected>NTAG213 (Core)</option>
+          <option value="NTAG215">NTAG215 (Core + Extended)</option>
+          <option value="NTAG216">NTAG216 (Core + Extended)</option>
+        </select>
+        <div class="help">
+          Determines memory size and whether "extended" fields are included.
         </div>
-        <div class="flex" style="margin-top: 26px">
-          <button class="btn btn--danger" id="resetBtn">Reset form</button>
-          <button class="btn btn--info" id="exampleBtn">Fill examples</button>
-        </div>
+      </div>
+      <div class="flex" style="margin-top: 26px">
+        <button class="btn btn--danger" id="resetBtn">Reset form</button>
+        <button class="btn btn--info" id="exampleBtn">Fill examples</button>
       </div>
       <div class="divider"></div>
       <div id="formHost">

@@ -22,6 +22,10 @@ $sans-serif:
 
 /* Custom CSS */
 
+.mono {
+  font-family: $monospace;
+}
+
 .layout--single.wide {
   .page,
   .breadcrumbs ol {
