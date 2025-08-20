@@ -142,6 +142,9 @@ layout: single
     font-size: 12px;
     margin-right: 6px;
   }
+  div[hidden] {
+    display: none;
+  }
 
   #controls {
     margin-top: 1em;
@@ -278,8 +281,8 @@ layout: single
     for (const sec of sections){
       const def = SPEC[sec.id];
       if (!def) continue;
-      const box = h('div', {class:'grid'});
-      host.append(h('h3', {class:'muted'}, sec.title));
+      const box = h('div', {class:`grid section-${sec.id}`});
+      host.append(h('h3', {class:`muted section-${sec.id}`}, sec.title));
       for (const f of def.fields){
         if (f.type === '-') continue; // skip reserved blocks from UI
         const row = h('div', {class:'field-row'});
@@ -418,6 +421,10 @@ layout: single
     const inp = h('input',{id:f.id,type:'text',placeholder:(f.examples?.[0]??'')});
     inp.addEventListener('input', ()=> { state.values.set(f.id, inp.value); buildMemory(); });
     return inp;
+  }
+
+  function enableSections() {
+    document.querySelectorAll('.section-extended').forEach(el => el.hidden = state.tagType === 'NTAG213');
   }
 
   // --- Building ---
@@ -606,9 +613,10 @@ layout: single
   // --- Init ---
   window.addEventListener('DOMContentLoaded', ()=>{
     renderForm();
+    enableSections();
     buildMemory();
 
-    document.getElementById('tagType').addEventListener('change', (e)=>{ state.tagType = e.target.value; buildMemory(); });
+    document.getElementById('tagType').addEventListener('change', (e)=>{ state.tagType = e.target.value; enableSections(); buildMemory(); });
 
     document.getElementById('exampleBtn').addEventListener('click', ()=>{
       const setIf = (id,v)=>{ const el = document.getElementById(id); if (!el) return; el.value = v; el.dispatchEvent(new Event('input', {bubbles:true})); };
