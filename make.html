@@ -153,11 +153,6 @@ layout: single
     outline: 2px solid #ff6b6b66;
     border-radius: 10px;
   }
-  .req {
-    color: #ff9aa2;
-    margin-left: 4px;
-    font-weight: 600;
-  }
 
   #controls {
     margin-top: 1em;
@@ -327,10 +322,10 @@ layout: single
       const box = h("div", { class: `grid section-${sec.id}` });
       host.append(h("h3", { class: `muted section-${sec.id}` }, sec.title));
       for (const f of def.fields) {
-        const row = h("div", { class: "field-row" });
+        const row = h("div", { class: "field-row", "data-field": f.id });
         const left = h("div");
         const label = h("label", {}, `${f.name}`);
-        if (f.required) label.append(h("span", { class: "req" }, "*"));
+        if (f.required) label.append(h("span", { class: "text--danger" }, "*"));
         left.append(label);
         left.append(renderInputForField(f));
         row.append(left);
