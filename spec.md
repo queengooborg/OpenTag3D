@@ -93,6 +93,9 @@ When attempting to read an RFID tag, the reader should check for the presence of
 
 The reader should then check the tag version. If the tag version is a newer _minor_ version than the reader expects, display a warning to the user and attempt to parse anyways. If the tag version is a newer _major_ version, the reader should display an error to the user and not attempt to parse the data.
 
+> [!CAUTION]
+> During the early beta of the tag format, it should be assumed that any and every version update is a major version. Once v1.000 of the tag specification is released, this caution note will no longer apply.
+
 ## Previous Considerations
 
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
