@@ -1185,37 +1185,13 @@ layout: single
         rgb.dispatchEvent(new Event("input", { bubbles: true }));
       }
 
-      const pt = document.getElementById("print_temp");
-      if (pt) {
-        pt.parentElement.querySelector('input[type="number"]').value = 210;
-        pt.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      const bt = document.getElementById("bed_temp");
-      if (bt) {
-        bt.parentElement.querySelector('input[type="number"]').value = 60;
-        bt.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      const td = document.getElementById("target_diameter");
-      if (td) {
-        td.parentElement.querySelector('input[type="number"]').value = 1.75;
-        td.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      const dn = document.getElementById("density");
-      if (dn) {
-        dn.parentElement.querySelector('input[type="number"]').value = 1.24;
-        dn.dispatchEvent(new Event("input", { bubbles: true }));
-      }
+      setIf("print_temp", 210);
+      setIf("bed_temp", 60);
+      setIf("target_diameter", 1.75);
+      setIf("density", 1.24);
       setIf("target_weight", 1000);
-      const d = document.getElementById("mfg_date");
-      if (d) {
-        d.value = new Date().toISOString().slice(0, 10);
-        d.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      const t = document.getElementById("mfg_time");
-      if (t) {
-        t.value = new Date().toISOString().slice(11, 19);
-        t.dispatchEvent(new Event("input", { bubbles: true }));
-      }
+      setIf("mfg_date", new Date().toISOString().slice(0, 10));
+      setIf("mfg_time", new Date().toISOString().slice(11, 19));
 
       buildMemory();
     });
