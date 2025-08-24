@@ -149,6 +149,15 @@ layout: single
   input[type="color"] {
     background-size: cover;
   }
+  .invalid {
+    outline: 2px solid #ff6b6b66;
+    border-radius: 10px;
+  }
+  .req {
+    color: #ff9aa2;
+    margin-left: 4px;
+    font-weight: 600;
+  }
 
   #controls {
     margin-top: 1em;
@@ -241,10 +250,22 @@ layout: single
   const h = (tag, attrs = {}, ...kids) => {
     const el = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
-      if (k === "class") el.className = v;
-      else if (k === "for") el.htmlFor = v;
-      else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
-      else el.setAttribute(k, v);
+      if (k === "class") {
+        el.className = v;
+      }
+      else if (k === "for") {
+        el.htmlFor = v;
+      }
+      else if (k === "required") {
+        el.setAttribute('aria-required', 'true');
+        el.required = true;
+      }
+      else if (k.startsWith("on")) {
+        el.addEventListener(k.slice(2), v);
+      }
+      else {
+        el.setAttribute(k, v);
+      }
     }
     for (const k of kids) el.append(k);
     return el;
@@ -308,7 +329,9 @@ layout: single
       for (const f of def.fields) {
         const row = h("div", { class: "field-row" });
         const left = h("div");
-        left.append(h("label", {}, `${f.name}`));
+        const label = h("label", {}, `${f.name}`);
+        if (f.required) label.append(h("span", { class: "req" }, "*"));
+        left.append(label);
         left.append(renderInputForField(f));
         row.append(left);
         const meta = h(
@@ -317,6 +340,7 @@ layout: single
           h("span", { class: "chip mono" }, `id:${f.id}`),
           h("span", { class: "chip mono" }, `addr:${f.start}`),
           h("span", { class: "chip mono" }, `len:${f.length}`),
+          f.required ? h("span", { class: "chip" }, "required") : "",
           (f.unit && !(["string", "version"].includes(f.unit))) ? h("span", { class: "chip" }, `unit:${f.unit}`) : "",
           f.scaling ? h("span", { class: "chip" }, `scaling:${f.scaling}`) : "",
         );
@@ -337,6 +361,7 @@ layout: single
         id: f.id,
         value: f.const ?? "OT",
         disabled: true,
+        required: f.required,
       });
       state.values.set(f.id, f.const ?? "OT");
       return inp;
@@ -350,12 +375,7 @@ layout: single
         type: "text",
         value: v,
         disabled: true,
-      });
-      const stored = h("input", {
-        id: f.id,
-        type: "number",
-        value: String(numeric),
-        disabled: true,
+        required: f.required,
       });
       state.values.set(f.id, numeric);
       const box = h("div");
@@ -369,6 +389,7 @@ layout: single
         id: f.id,
         type: "text",
         placeholder: f.examples?.[0] || "",
+        required: f.required,
       });
       inp.addEventListener("input", () => {
         state.values.set(f.id, inp.value);
@@ -382,6 +403,7 @@ layout: single
         type: "color",
         id: f.id + "_rgb",
         value: "#FFA64D",
+        required: f.required,
       });
       const alpha = h("input", {
         type: "number",
@@ -390,6 +412,7 @@ layout: single
         max: 255,
         step: 1,
         value: 255,
+        required: f.required,
       });
       const out = h("input", { type: "hidden", id: f.id, readonly: true });
       const update = () => {
@@ -420,6 +443,7 @@ layout: single
         min: 0,
         step: "0.001",
         placeholder: "1.750 (mm)",
+        required: f.required,
       });
       const sync = () => {
         const um = Math.round(parseFloat(mm.value || "0") * 1000);
@@ -454,6 +478,7 @@ layout: single
         min: 0,
         step: 5,
         placeholder: "210 (°C)",
+        required: f.required,
       });
       const scale = f.scaling || 5;
       const sync = () => {
@@ -479,6 +504,7 @@ layout: single
         min: 0,
         step: "0.1",
         placeholder: f.id === "mfi_load" ? "2.16 (kg)" : "6.3",
+        required: f.required,
       });
       const sync = () => {
         let val = parseFloat(mfi.value || "0");
@@ -507,6 +533,7 @@ layout: single
         min: 0,
         step: "0.001",
         placeholder: "1.240 (g/cm³)",
+        required: f.required,
       });
       const sync = () => {
         const ug = Math.round(parseFloat(gcm3.value || "0") * 1000);
@@ -531,6 +558,7 @@ layout: single
         min: 0,
         step: "1",
         placeholder: f.examples?.[0] ?? "",
+        required: f.required,
       });
       inp.addEventListener("input", () => {
         state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
@@ -546,6 +574,7 @@ layout: single
         max: 255,
         step: "1",
         placeholder: f.examples?.[0] ?? "",
+        required: f.required,
       });
       inp.addEventListener("input", () => {
         state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
@@ -554,7 +583,7 @@ layout: single
       return inp;
     }
     if (f.type === "int[4]" && f.id === "mfg_date") {
-      const inp = h("input", { id: f.id, type: "date" });
+      const inp = h("input", { id: f.id, type: "date", required: f.required });
       const sync = () => {
         state.values.set(f.id, inp.value);
         buildMemory();
@@ -564,7 +593,7 @@ layout: single
       return inp;
     }
     if (f.type === "int[3]" && f.id === "mfg_time") {
-      const inp = h("input", { id: f.id, type: "time", step: 1 });
+      const inp = h("input", { id: f.id, type: "time", step: 1, required: f.required });
       const sync = () => {
         state.values.set(f.id, inp.value);
         buildMemory();
@@ -579,6 +608,7 @@ layout: single
       id: f.id,
       type: "text",
       placeholder: f.examples?.[0] ?? "",
+      required: f.required,
     });
     inp.addEventListener("input", () => {
       state.values.set(f.id, inp.value);
@@ -626,6 +656,28 @@ layout: single
       fields.push(
         ...SPEC.extended.fields.map((f) => ({ set: "extended", ...f })),
       );
+
+    // --- required validation helpers ---
+    const isPresent = (f, val) => {
+      if (!f.required) return true;
+      if (f.type === "ascii" || f.type === "utf8") return typeof val === "string" && val.trim().length > 0;
+      if (f.type === "rgba") return Array.isArray(val) && val.length === 4;
+      if (f.type === "int" || f.type === "int[3]" || f.type === "int[4]") {
+        if (val === undefined || val === null) return false;
+        const n = (typeof val === "number") ? val : Number(val);
+        return Number.isFinite(n);
+      }
+      return val !== undefined && val !== null && String(val).length > 0;
+    };
+
+    const missing = fields.filter(f => f.required && !isPresent(f, state.values.get(f.id)));
+
+    // highlight missing rows
+    document.querySelectorAll('[data-field]').forEach(el => el.classList.remove('invalid'));
+    for (const f of missing) {
+      const row = document.querySelector(`[data-field="${f.id}"]`);
+      if (row) row.classList.add('invalid');
+    }
 
     const rows = [];
     const be = true; // big-endian storage for multi-byte ints
@@ -723,8 +775,20 @@ layout: single
     // Update hexdump
     document.getElementById("hexdump").textContent = hexdump(buf, start);
 
-    // Enable Web NFC export if applicable
-    if ("NDEFReader" in window) document.getElementById("writeWebNFC").disabled = false;
+    // Enable/disable exports based on required completeness
+    const hasMissing = missing.length > 0;
+    const setDisabled = (id, dis) => { const el = document.getElementById(id); if (el) el.disabled = !!dis; };
+
+    setDisabled('downloadBin',     hasMissing);
+    setDisabled('downloadFlipper', hasMissing);
+    setDisabled('downloadMap',     hasMissing);
+    setDisabled('writeWebNFC',     hasMissing || !("NDEFReader" in window));
+
+    if (hasMissing) {
+      msg(`Please fill required fields: ${missing.map(m => m.name || m.id).join(', ')}`, true);
+    } else {
+      msg('');
+    }
 
     // Wire export actions (fresh closures)
     document.getElementById("downloadBin").onclick = () =>
@@ -1092,16 +1156,16 @@ layout: single
       };
       setIf("manufacturer", "Polar Filament");
       setIf("material_base", "PLA");
-      setIf("material_mod", "CF");
       setIf("color_name", "Deep Ocean Blue");
+
       const rgb = document.getElementById("color_rgb");
-      if (rgb) {
-        rgb.value = "#1E90FF";
-      }
       const al = document.getElementById("color_a");
-      if (al) {
+      if (rgb && al) {
+        rgb.value = "#1E90FF";
         al.value = 255;
+        rgb.dispatchEvent(new Event("input", { bubbles: true }));
       }
+
       const pt = document.getElementById("print_temp");
       if (pt) {
         pt.parentElement.querySelector('input[type="number"]').value = 210;
@@ -1117,7 +1181,7 @@ layout: single
         td.parentElement.querySelector('input[type="number"]').value = 1.75;
         td.dispatchEvent(new Event("input", { bubbles: true }));
       }
-      const dn = document.getElementById("target_diameter");
+      const dn = document.getElementById("density");
       if (dn) {
         dn.parentElement.querySelector('input[type="number"]').value = 1.24;
         dn.dispatchEvent(new Event("input", { bubbles: true }));
@@ -1133,6 +1197,8 @@ layout: single
         t.value = new Date().toISOString().slice(11, 19);
         t.dispatchEvent(new Event("input", { bubbles: true }));
       }
+
+      buildMemory();
     });
 
     // File picker
