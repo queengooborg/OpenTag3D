@@ -106,7 +106,7 @@ These are topics that were heavily discussed during the development of OpenTag3D
   - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
   - The hardware used for reading MIFARE tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
 - JSON vs Memory Map
-  - Formats such as JSON (human-readable text) take up considerably more more memory than memory mapped
+  - Formats such as JSON (human-readable text) take up considerably more memory than memory mapped
     - For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability
   - NTAG216 tags only have 888 bytes of usable memory, and NTAG213 tags only have 144 bytes, which would be eaten up quickly
     - With memory mapping, the core data was able to easily fit in 144 bytes
