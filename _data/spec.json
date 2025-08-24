@@ -13,6 +13,7 @@
         "usage": "operational",
         "const": "OT",
         "examples": ["OT"],
+        "required": true,
         "description": "This is always \"OT\", this helps differentiate between the OpenTag3D and other formats."
       },
       {
@@ -25,6 +26,7 @@
         "usage": "operational",
         "scaling": 0.001,
         "examples": [1234],
+        "required": true,
         "description": "RFID tag data format version, with 3 implied decimal points. Eg `1000` → version `1.000`."
       },
       {
@@ -36,6 +38,7 @@
         "length": 16,
         "usage": "display",
         "examples": ["Polar Filament"],
+        "required": true,
         "description": "Name of filament manufacturer. Long names should be abbreviated or truncated."
       },
       {
@@ -47,6 +50,7 @@
         "length": 5,
         "usage": "display",
         "examples": ["PLA", "PETG", "PCTFE", "TPU"],
+        "required": true,
         "description": "Material name in plain text, excluding any modifiers."
       },
       {
@@ -81,6 +85,7 @@
         "usage": "display",
         "channels": ["r", "g", "b", "a"],
         "examples": [[255, 166, 77, 255]],
+        "required": true,
         "description": "Color stored as 4 separate 1-byte integers for red, green, blue and alpha, in the sRGB color space."
       },
       {
@@ -93,6 +98,7 @@
         "usage": "operational",
         "scaling": 0.001,
         "examples": [1750, 2850],
+        "required": true,
         "description": "Filament diameter (target) in µm (micrometers). Eg `1750` → `1.750mm`."
       },
       {
@@ -104,6 +110,7 @@
         "length": 2,
         "usage": "operational",
         "examples": [1000, 5000, 750],
+        "required": true,
         "description": "Filament weight in grams, excluding spool weight. This is the TARGET weight (e.g., 1kg). Actual measured weight is stored in a different field."
       },
       {
@@ -116,6 +123,7 @@
         "usage": "operational",
         "scaling": 5,
         "examples": [42],
+        "required": true,
         "description": "Recommended print temperature in degrees Celsius, divided by 5. For example, `42` = `210°C`."
       },
       {
@@ -128,6 +136,7 @@
         "usage": "operational",
         "scaling": 5,
         "examples": [12, 16],
+        "required": true,
         "description": "Recommended bed temperature in degrees Celsius, divided by 5. For example, `12` = `60°C`."
       },
       {
@@ -140,6 +149,7 @@
         "usage": "operational",
         "scaling": 0.001,
         "examples": [1240, 3900],
+        "required": true,
         "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`."
       },
       {
@@ -151,7 +161,7 @@
         "length": 32,
         "usage": "operational",
         "examples": ["pfil.us?i=8078-RQSR"],
-        "description": "Optional URL to access online JSON additional parameters. Formatted without `https` to save space."
+        "description": "URL to access online JSON additional parameters. Formatted without `https` to save space."
       }
     ]
   },
