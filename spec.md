@@ -81,7 +81,7 @@ The URL should respond with the following JSON:
 
 ```json
 {
-  "opentag_version": "{{ site.spec.data.version }}"
+  "opentag_version": "{{ site.data.spec.version }}"
 }
 ```
 
