@@ -306,7 +306,6 @@ layout: single
       const box = h("div", { class: `grid section-${sec.id}` });
       host.append(h("h3", { class: `muted section-${sec.id}` }, sec.title));
       for (const f of def.fields) {
-        if (f.type === "-") continue; // skip reserved blocks from UI
         const row = h("div", { class: "field-row" });
         const left = h("div");
         left.append(h("label", {}, `${f.name}`));
@@ -921,7 +920,6 @@ layout: single
       ...(SPEC.extended ? SPEC.extended.fields : []),
     ];
     for (const f of allFields) {
-      if (f.type === "-") continue;
       const addr = parseHex(f.start);
       const bytes = read(addr, f.length);
 

@@ -143,16 +143,6 @@
         "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`."
       },
       {
-        "name": "RESERVED",
-        "id": "reserved_core",
-        "unit": null,
-        "type": "-",
-        "start": "0x5A",
-        "length": 18,
-        "examples": null,
-        "description": "Reserved for future use. This goes up to the memory limit of NTAG213."
-      },
-      {
         "name": "Online Data URL",
         "id": "online_data_url",
         "unit": "string",
@@ -381,16 +371,6 @@
         "usage": "operational",
         "examples": [80],
         "description": "Default recommended speed."
-      },
-      {
-        "name": "RESERVED",
-        "id": "reserved_extended",
-        "unit": null,
-        "type": "-",
-        "start": "0xCB",
-        "length": 308,
-        "examples": null,
-        "description": "Reserved for future use."
       }
     ]
   }
