@@ -46,7 +46,7 @@
         "start": "0x24",
         "length": 5,
         "usage": "display",
-        "examples": ["PLA", "PETG", "PCTFE"],
+        "examples": ["PLA", "PETG", "PCTFE", "TPU"],
         "description": "Material name in plain text, excluding any modifiers."
       },
       {
@@ -57,7 +57,7 @@
         "start": "0x29",
         "length": 5,
         "usage": "display",
-        "examples": ["CF", "HF", "Pro", "Silk"],
+        "examples": ["CF", "HF", "Pro", "Silk", "95A"],
         "description": "Material subcategory or modifier in plain text. Long modifiers may need to be abbreviated."
       },
       {
