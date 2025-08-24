@@ -321,6 +321,7 @@ layout: single
       const box = h("div", { class: `grid section-${sec.id}` });
       host.append(h("h3", { class: `muted section-${sec.id}` }, sec.title));
       for (const f of def.fields) {
+        if (["tag_format", "tag_version"].includes(f.id)) continue;
         const row = h("div", { class: "field-row", "data-field": f.id });
         const left = h("div");
         const label = h("label", {}, `${f.name}`);
@@ -351,34 +352,6 @@ layout: single
   }
 
   function renderInputForField(f) {
-    // Tag format constant
-    if (f.id === "tag_format") {
-      const inp = h("input", {
-        id: f.id,
-        value: f.const ?? "OT",
-        disabled: true,
-        required: f.required,
-      });
-      state.values.set(f.id, f.const ?? "OT");
-      return inp;
-    }
-    // Version as fixed integer (3 implied decimals)
-    if (f.id === "tag_version") {
-      const v = SPEC.version;
-      const numeric = Math.round(parseFloat(v) * 1000) || 0;
-      const vis = h("input", {
-        id: f.id + "_vis",
-        type: "text",
-        value: v,
-        disabled: true,
-        required: f.required,
-      });
-      state.values.set(f.id, numeric);
-      const box = h("div");
-      box.append(vis);
-      return box;
-    }
-
     // Generic by type
     if (f.type === "ascii" || f.type === "utf8") {
       const inp = h("input", {
@@ -673,6 +646,12 @@ layout: single
       }
       return val !== undefined && val !== null && String(val).length > 0;
     };
+
+    state.values.set("tag_format", "OT");
+    state.values.set(
+      "tag_version",
+      Math.round(parseFloat(SPEC.version) * 1000),
+    );
 
     const missing = fields.filter(
       (f) => f.required && !isPresent(f, state.values.get(f.id)),
