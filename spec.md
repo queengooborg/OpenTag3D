@@ -4,7 +4,7 @@ layout: single
 toc: true
 ---
 
-# OpenTag3D Standards
+# OpenTag3D Standard
 
 Current Version: {{ site.data.spec.version }}
 
