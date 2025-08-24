@@ -7,6 +7,7 @@ layout: single
   :root {
     --card: #131822;
     --muted: #a9b5c9;
+    --error: #ff6b6b;
     --accent: #7aa2ff;
     --line: #1f2733;
   }
@@ -58,6 +59,7 @@ layout: single
   }
   input[type="color"] {
     height: 45px;
+    background-size: cover;
   }
   .row {
     display: grid;
@@ -133,6 +135,7 @@ layout: single
     border: 1px dashed #243049;
     padding: 10px;
     border-radius: 10px;
+    transition: border-color 0.2s;
   }
   .chip {
     display: inline-block;
@@ -146,16 +149,15 @@ layout: single
   div[hidden] {
     display: none;
   }
-  input[type="color"] {
-    background-size: cover;
-  }
   .invalid {
-    outline: 2px solid #ff6b6b66;
-    border-radius: 10px;
+    border-color: var(--error);
   }
 
   #controls {
     margin-top: 1em;
+  }
+  #messages {
+    min-height: 1em;
   }
 
   @media screen and (max-width: 900px), screen and (max-device-width: 900px) {
@@ -187,9 +189,7 @@ layout: single
       style="display: none"
     />
   </div>
-  <div id="messages" class="help">
-    <br />
-  </div>
+  <div id="messages" class="help"></div>
   <details class="scroll" id="hexdumpBox">
     <summary>Show hex dump</summary>
     <pre id="hexdump" class="mono"></pre>
@@ -335,7 +335,6 @@ layout: single
           h("span", { class: "chip mono" }, `id:${f.id}`),
           h("span", { class: "chip mono" }, `addr:${f.start}`),
           h("span", { class: "chip mono" }, `len:${f.length}`),
-          f.required ? h("span", { class: "chip" }, "required") : "",
           f.unit && !["string", "version"].includes(f.unit)
             ? h("span", { class: "chip" }, `unit:${f.unit}`)
             : "",
@@ -769,35 +768,42 @@ layout: single
     // Update hexdump
     document.getElementById("hexdump").textContent = hexdump(buf, start);
 
-    // Enable/disable exports based on required completeness
-    const hasMissing = missing.length > 0;
-    const setDisabled = (id, dis) => {
-      const el = document.getElementById(id);
-      if (el) el.disabled = !!dis;
+    const checkMissing = () => {
+      if (missing.length > 0) {
+        msg(
+          `Please fill required fields: ${missing.map((m) => m.name || m.id).join(", ")}`,
+          true,
+        );
+        return true;
+      } else {
+        msg("");
+        return false;
+      }
     };
 
-    setDisabled("downloadBin", hasMissing);
-    setDisabled("downloadFlipper", hasMissing);
-    setDisabled("downloadMap", hasMissing);
-    setDisabled("writeWebNFC", hasMissing || !("NDEFReader" in window));
-
-    if (hasMissing) {
-      msg(`Please fill required fields: ${missing.map(m => m.name || m.id).join(', ')}`, true);
-    } else {
-      msg('');
-    }
-
     // Wire export actions (fresh closures)
-    document.getElementById("downloadBin").onclick = () =>
-      downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
-    document.getElementById("downloadMap").onclick = () =>
-      downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
-    document.getElementById("downloadFlipper").onclick = () =>
-      downloadFlipperNfc(buf, start, state.tagType);
-    document.getElementById("writeWebNFC").onclick = () =>
-      writeViaWebNFC(buf, state.tagType).catch((e) =>
-        msg("Web NFC error: " + e.message, true),
-      );
+    document.getElementById("downloadBin").onclick = () => {
+      if (!checkMissing()) {
+        downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
+      }
+    };
+    document.getElementById("downloadMap").onclick = () => {
+      if (!checkMissing()) {
+        downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
+      }
+    };
+    document.getElementById("downloadFlipper").onclick = () => {
+      if (!checkMissing()) {
+        downloadFlipperNfc(buf, start, state.tagType);
+      }
+    };
+    document.getElementById("writeWebNFC").onclick = () => {
+      if (!checkMissing()) {
+        writeViaWebNFC(buf, state.tagType).catch((e) =>
+          msg("Web NFC error: " + e.message, true),
+        );
+      }
+    };
 
     return { buf, rows, start };
   }
@@ -830,11 +836,7 @@ layout: single
   function msg(s, isErr = false) {
     const m = document.getElementById("messages");
     m.textContent = s;
-    m.style.color = isErr ? "#ff6b6b" : "var(--muted)";
-    if (!isErr)
-      setTimeout(() => {
-        m.textContent = "";
-      }, 2500);
+    m.style.color = isErr ? "var(--error)" : "var(--muted)";
   }
 
   // --- Web NFC export (NDEF) ---
@@ -1204,6 +1206,8 @@ layout: single
           e.target.value = "";
         }
       });
+
+    document.getElementById("writeWebNFC").disabled = !("NDEFReader" in window);
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       renderForm();
