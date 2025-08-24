@@ -85,6 +85,14 @@ The URL should respond with the following JSON:
 }
 ```
 
+## Reader Implementation Guidelines
+
+While every implementation for reading OpenTag3D RFID tags will be different, this specification aims to set a few requirements to ensure that functionality is consistent across printers and other hardware -- we'll call these the "reader" for continuity.
+
+When attempting to read an RFID tag, the reader should check for the presence of the tag format field and check if it is "OT" (0x4F54). If it is not set to "OT", it is not an OpenTag3D tag.
+
+The reader should then check the tag version. If the tag version is a newer _minor_ version than the reader expects, display a warning to the user and attempt to parse anyways. If the tag version is a newer _major_ version, the reader should display an error to the user and not attempt to parse the data.
+
 ## Previous Considerations
 
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
