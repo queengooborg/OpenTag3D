@@ -91,7 +91,7 @@
       {
         "name": "Target Diameter",
         "id": "target_diameter",
-        "unit": "µm",
+        "unit": "mm",
         "type": "int",
         "start": "0x52",
         "length": 2,
@@ -142,7 +142,7 @@
       {
         "name": "Density",
         "id": "density",
-        "unit": "µg/cm³",
+        "unit": "g/cm³",
         "type": "int",
         "start": "0x58",
         "length": 2,
