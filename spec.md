@@ -71,7 +71,7 @@ This memory address starts just outside the range of NTAG213; an NTAG215/216 mus
 Sometimes a filament manufacturer may want to include supplemental data for advanced users that doesn't fit or otherwise cannot be stored on the RFID tag itself. One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory. OpenTag3D defines a field for a "web API" URL which can be used to look up this information.
 
 > [!NOTE]
-> The web API will only be used for advanced supplemental data and will never be used for critical information required by printers in order to print the material property.
+> The web API will only be used for advanced supplemental data and will never be used for critical information required by printers in order to print the material properly.
 
 At this time, the web API is only a placeholder for future implementation, as the OpenTag3D specification has not determined what information should be included in the web API standard. For now, it only defines the structure.
 
