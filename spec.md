@@ -68,13 +68,22 @@ This memory address starts just outside the range of NTAG213; an NTAG215/216 mus
 
 ### Web API Standard
 
-Some tags can contain extended data that doesn't fit or doesn't belong on the RFID tag itself. One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory.
+Sometimes a filament manufacturer may want to include supplemental data for advanced users that doesn't fit or otherwise cannot be stored on the RFID tag itself. One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory. OpenTag3D defines a field for a "web API" URL which can be used to look up this information.
 
-These complex variables can be looked up using the "web API" URL that is stored on the RFID tag.
+> [!NOTE]
+> The web API will only be used for advanced supplemental data and will never be used for critical information required by printers in order to print the material property.
 
-The format of this data should be JSON.
+At this time, the web API is only a placeholder for future implementation, as the OpenTag3D specification has not determined what information should be included in the web API standard. For now, it only defines the structure.
 
-The web API has not yet been defined for OpenTag3D, as the exact contents of this data are still open to discussion.
+The "Online Data URL" field should be populated with the URL that responds with the web API data. The URL must return JSON data when the `Accept` HTTP header is set to `application/json`. Implementers are welcome to create a user-friendly UI if the `Accept` header is set to anything else, but it _must_ return JSON format if the client calls for it.
+
+The URL should respond with the following JSON:
+
+```json
+{
+  "opentag_version": "{{ site.spec.data.version }}"
+}
+```
 
 ## Previous Considerations
 

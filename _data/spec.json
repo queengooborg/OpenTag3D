@@ -1,5 +1,5 @@
 {
-  "version": "0.002",
+  "version": "0.003",
   "core": {
     "address_range": { "start": "0x10", "end": "0x9F" },
     "fields": [
@@ -161,7 +161,7 @@
         "length": 32,
         "usage": "operational",
         "examples": ["pfil.us?i=8078-RQSR"],
-        "description": "URL to access online JSON additional parameters. Formatted without `https` to save space."
+        "description": "Optional URL to access online JSON additional parameters. Formatted without `https` to save space."
       }
     ]
   },
