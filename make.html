@@ -228,7 +228,9 @@ layout: single
   const SPEC = {{site.data.spec | jsonify}};
 
   /* prettier-ignore-end */
+</script>
 
+<script>
   // Known tag capacities (user memory) in bytes
   const TAG_CAP = {
     NTAG213: 144, // 0x10..0x9F
@@ -247,18 +249,14 @@ layout: single
     for (const [k, v] of Object.entries(attrs)) {
       if (k === "class") {
         el.className = v;
-      }
-      else if (k === "for") {
+      } else if (k === "for") {
         el.htmlFor = v;
-      }
-      else if (k === "required") {
-        el.setAttribute('aria-required', 'true');
+      } else if (k === "required") {
+        el.setAttribute("aria-required", "true");
         el.required = true;
-      }
-      else if (k.startsWith("on")) {
+      } else if (k.startsWith("on")) {
         el.addEventListener(k.slice(2), v);
-      }
-      else {
+      } else {
         el.setAttribute(k, v);
       }
     }
@@ -266,7 +264,8 @@ layout: single
     return el;
   };
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  const hex = (n, w = 2) => Number(n).toString(16).toUpperCase().padStart(w, "0");
+  const hex = (n, w = 2) =>
+    Number(n).toString(16).toUpperCase().padStart(w, "0");
   const addrHex = (a) => "0x" + hex(a);
   const parseHex = (s) => (typeof s === "number" ? s : parseInt(s, 16));
   const textEncoder = new TextEncoder();
@@ -336,7 +335,9 @@ layout: single
           h("span", { class: "chip mono" }, `addr:${f.start}`),
           h("span", { class: "chip mono" }, `len:${f.length}`),
           f.required ? h("span", { class: "chip" }, "required") : "",
-          (f.unit && !(["string", "version"].includes(f.unit))) ? h("span", { class: "chip" }, `unit:${f.unit}`) : "",
+          f.unit && !["string", "version"].includes(f.unit)
+            ? h("span", { class: "chip" }, `unit:${f.unit}`)
+            : "",
           f.scaling ? h("span", { class: "chip" }, `scaling:${f.scaling}`) : "",
         );
         row.append(meta);
@@ -588,7 +589,12 @@ layout: single
       return inp;
     }
     if (f.type === "int[3]" && f.id === "mfg_time") {
-      const inp = h("input", { id: f.id, type: "time", step: 1, required: f.required });
+      const inp = h("input", {
+        id: f.id,
+        type: "time",
+        step: 1,
+        required: f.required,
+      });
       const sync = () => {
         state.values.set(f.id, inp.value);
         buildMemory();
@@ -635,7 +641,9 @@ layout: single
       const ascii = [...slice]
         .map((b) => (b >= 32 && b <= 126 ? String.fromCharCode(b) : "."))
         .join("");
-      lines.push(`${addrHex(addr)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`);
+      lines.push(
+        `${addrHex(addr)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`,
+      );
     }
     return lines.join("\n");
   }
@@ -655,23 +663,28 @@ layout: single
     // --- required validation helpers ---
     const isPresent = (f, val) => {
       if (!f.required) return true;
-      if (f.type === "ascii" || f.type === "utf8") return typeof val === "string" && val.trim().length > 0;
+      if (f.type === "ascii" || f.type === "utf8")
+        return typeof val === "string" && val.trim().length > 0;
       if (f.type === "rgba") return Array.isArray(val) && val.length === 4;
       if (f.type === "int" || f.type === "int[3]" || f.type === "int[4]") {
         if (val === undefined || val === null) return false;
-        const n = (typeof val === "number") ? val : Number(val);
-        return Number.isFinite(n);
+        const n = typeof val === "number" ? val : Number(val);
+        return Number.isFinite(n) && n != 0;
       }
       return val !== undefined && val !== null && String(val).length > 0;
     };
 
-    const missing = fields.filter(f => f.required && !isPresent(f, state.values.get(f.id)));
+    const missing = fields.filter(
+      (f) => f.required && !isPresent(f, state.values.get(f.id)),
+    );
 
     // highlight missing rows
-    document.querySelectorAll('[data-field]').forEach(el => el.classList.remove('invalid'));
+    document
+      .querySelectorAll("[data-field]")
+      .forEach((el) => el.classList.remove("invalid"));
     for (const f of missing) {
       const row = document.querySelector(`[data-field="${f.id}"]`);
-      if (row) row.classList.add('invalid');
+      if (row) row.classList.add("invalid");
     }
 
     const rows = [];
@@ -759,11 +772,18 @@ layout: single
           const bytes = new Uint8Array([hh & 0xff, mm & 0xff, ss & 0xff]);
           push(f, addr, bytes);
         } else {
-          if (typeof val === "number") push(f, addr, packInt(val, f.length, be));
+          if (typeof val === "number")
+            push(f, addr, packInt(val, f.length, be));
           else push(f, addr, encodeUtf8(String(val || ""), f.length));
         }
       } catch (e) {
-        rows.push([f.name, addrHex(addr), f.length, "-", `Error: ${e.message}`]);
+        rows.push([
+          f.name,
+          addrHex(addr),
+          f.length,
+          "-",
+          `Error: ${e.message}`,
+        ]);
       }
     }
 
@@ -772,12 +792,15 @@ layout: single
 
     // Enable/disable exports based on required completeness
     const hasMissing = missing.length > 0;
-    const setDisabled = (id, dis) => { const el = document.getElementById(id); if (el) el.disabled = !!dis; };
+    const setDisabled = (id, dis) => {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !!dis;
+    };
 
-    setDisabled('downloadBin',     hasMissing);
-    setDisabled('downloadFlipper', hasMissing);
-    setDisabled('downloadMap',     hasMissing);
-    setDisabled('writeWebNFC',     hasMissing || !("NDEFReader" in window));
+    setDisabled("downloadBin", hasMissing);
+    setDisabled("downloadFlipper", hasMissing);
+    setDisabled("downloadMap", hasMissing);
+    setDisabled("writeWebNFC", hasMissing || !("NDEFReader" in window));
 
     if (hasMissing) {
       msg(`Please fill required fields: ${missing.map(m => m.name || m.id).join(', ')}`, true);
@@ -1073,7 +1096,8 @@ layout: single
   // --- Simple built-in tests ---
   function runTests() {
     const results = [];
-    const assert = (name, cond) => results.push(`${cond ? "✅" : "❌"} ${name}`);
+    const assert = (name, cond) =>
+      results.push(`${cond ? "✅" : "❌"} ${name}`);
 
     // Temperature scaling
     (function () {
