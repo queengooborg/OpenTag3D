@@ -6,7 +6,7 @@ toc: true
 
 ## History
 
-The OpenTag3D protocol, initially called "Open 3D-RFID", was originally incubated by the Bambu Research Group, a group dedicated to researching and reverse engineering the tag data from Bambu Lab's RFID tags. When the RFID tags were launched with Bambu Lab spools using a proprietary, encrypted format, the group knew that it was only a matter of time before other brands released their own proprietary formats.
+The OpenTag3D protocol, initially called "Open 3D-RFID", was originally drafted by Polar Filament and incubated within the Bambu Research Group, a group dedicated to researching and reverse engineering the tag data from Bambu Lab's RFID tags. When the RFID tags were launched with Bambu Lab spools using a proprietary, encrypted format, the group knew that it was only a matter of time before other brands released their own proprietary formats.
 
 As the OpenTag3D protocol began to reach maturity, it was later moved to its own repository, where it continues to incubate to this day.
 
