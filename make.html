@@ -370,7 +370,7 @@ layout: single
       const color = h("input", {
         type: "color",
         id: f.id + "_rgb",
-        value: "#FFA64D",
+        value: f.id === "color_1" ? "#FFFFFF" : "#000000",
         required: f.required,
       });
       const alpha = h("input", {
@@ -379,7 +379,7 @@ layout: single
         min: 0,
         max: 255,
         step: 1,
-        value: 255,
+        value: f.id === "color_1" ? 255 : 0,
         required: f.required,
       });
       const out = h("input", { type: "hidden", id: f.id, readonly: true });
@@ -1157,15 +1157,12 @@ layout: single
       setIf("manufacturer", "Polar Filament");
       setIf("material_base", "PLA");
       setIf("color_name", "Deep Ocean Blue");
-
-      const rgb = document.getElementById("color_rgb");
-      const al = document.getElementById("color_a");
-      if (rgb && al) {
-        rgb.value = "#1E90FF";
-        al.value = 255;
-        rgb.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-
+      setif("color_1_rgb", "#1E90FF");
+      setif("color_1_a", 255);
+      setif("color_2_rgb", "#000000");
+      setif("color_2_a", 0);
+      setif("color_2_rgb", "#000000");
+      setif("color_2_a", 0);
       setIf("print_temp", 210);
       setIf("bed_temp", 60);
       setIf("target_diameter", 1.75);

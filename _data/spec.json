@@ -1,5 +1,5 @@
 {
-  "version": "0.003",
+  "version": "0.004",
   "core": {
     "address_range": { "start": "0x10", "end": "0x9F" },
     "fields": [
@@ -76,8 +76,8 @@
         "description": "Color in plain text."
       },
       {
-        "name": "Color Hex",
-        "id": "color",
+        "name": "Color 1 Hex",
+        "id": "color_1",
         "unit": "RGBA",
         "type": "rgba",
         "start": "0x4E",
@@ -86,14 +86,38 @@
         "channels": ["r", "g", "b", "a"],
         "examples": [[255, 166, 77, 255]],
         "required": true,
-        "description": "Color stored as 4 separate 1-byte integers for red, green, blue and alpha, in the sRGB color space."
+        "description": "Primary filament color stored as 4 separate 1-byte integers for red, green, blue and alpha, in the sRGB color space."
+      },
+      {
+        "name": "Color 2 Hex",
+        "id": "color_2",
+        "unit": "RGBA",
+        "type": "rgba",
+        "start": "0x52",
+        "length": 4,
+        "usage": "display",
+        "channels": ["r", "g", "b", "a"],
+        "examples": [[0, 0, 0, 0]],
+        "description": "Second filament color, if applicable. Set to transparent black if the filament is single color."
+      },
+      {
+        "name": "Color 3 Hex",
+        "id": "color_3",
+        "unit": "RGBA",
+        "type": "rgba",
+        "start": "0x56",
+        "length": 4,
+        "usage": "display",
+        "channels": ["r", "g", "b", "a"],
+        "examples": [[0, 0, 0, 0]],
+        "description": "Third filament color, if applicable. Set to transparent black if the filament is dual color."
       },
       {
         "name": "Target Diameter",
         "id": "target_diameter",
         "unit": "mm",
         "type": "int",
-        "start": "0x52",
+        "start": "0x5A",
         "length": 2,
         "usage": "operational",
         "scaling": 0.001,
@@ -106,7 +130,7 @@
         "id": "target_weight",
         "unit": "g",
         "type": "int",
-        "start": "0x54",
+        "start": "0x5C",
         "length": 2,
         "usage": "operational",
         "examples": [1000, 5000, 750],
@@ -118,7 +142,7 @@
         "id": "print_temp",
         "unit": "ºC",
         "type": "int",
-        "start": "0x56",
+        "start": "0x5E",
         "length": 1,
         "usage": "operational",
         "scaling": 5,
@@ -131,7 +155,7 @@
         "id": "bed_temp",
         "unit": "ºC",
         "type": "int",
-        "start": "0x57",
+        "start": "0x5F",
         "length": 1,
         "usage": "operational",
         "scaling": 5,
@@ -144,7 +168,7 @@
         "id": "density",
         "unit": "g/cm³",
         "type": "int",
-        "start": "0x58",
+        "start": "0x60",
         "length": 2,
         "usage": "operational",
         "scaling": 0.001,
