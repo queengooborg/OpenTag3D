@@ -98,7 +98,7 @@
         "usage": "display",
         "channels": ["r", "g", "b", "a"],
         "examples": [[0, 0, 0, 0]],
-        "description": "Second filament color, if applicable. Set to transparent black if the filament is single color."
+        "description": "Second filament color, if the filament is multi-color. Set to transparent black if the filament is single color."
       },
       {
         "name": "Color 3 Hex",
@@ -110,7 +110,7 @@
         "usage": "display",
         "channels": ["r", "g", "b", "a"],
         "examples": [[0, 0, 0, 0]],
-        "description": "Third filament color, if applicable. Set to transparent black if the filament is dual color."
+        "description": "Third filament color, if the filament is multi-color. Set to transparent black if the filament is dual color."
       },
       {
         "name": "Target Diameter",
