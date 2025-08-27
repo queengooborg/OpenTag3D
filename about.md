@@ -2,6 +2,7 @@
 title: About
 layout: single
 toc: true
+description: Learn more about the OpenTag3D spec and its history, backers and consortium.
 ---
 
 ## History

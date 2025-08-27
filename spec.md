@@ -2,6 +2,7 @@
 title: Specification
 layout: single
 toc: true
+description: The details of the OpenTag3D specification.
 ---
 
 # OpenTag3D Standard

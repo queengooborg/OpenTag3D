@@ -4,6 +4,7 @@ logo: ./assets/images/logo.svg
 layout: splash
 permalink: /
 header:
+  og_image: /assets/images/og_image.jpg
   overlay_color: "#d4c0e7"
   overlay_filter: "0.6"
   overlay_image: /assets/images/background.jpg
