@@ -1,5 +1,5 @@
 {
-  "version": "0.004",
+  "version": "0.005",
   "core": {
     "address_range": { "start": "0x10", "end": "0x9F" },
     "fields": [

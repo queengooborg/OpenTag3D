@@ -97,6 +97,27 @@ The reader should then check the tag version. If the tag version is a newer _min
 > [!CAUTION]
 > During the early beta of the tag format, it should be assumed that any and every version update is a major version. Once v1.000 of the tag specification is released, this caution note will no longer apply.
 
+## Branding Guidelines
+
+Adding the OpenTag3D logo or any OpenTag3D branding is entirely optional, but is recommended to show that your filament or hardware uses or supports the OpenTag3D specification. With that said, if you decide to include OpenTag3D branding, there are a few guidelines on how to do so.
+
+When including OpenTag3D branding, you may:
+
+- Include either variation of logo in printed or digital media
+- Change the logo color as desired (although black or white is recommended)
+- Specify the name in plain text in place of the logo
+- _Slightly_ modify the logo for thematic effect (such as adding drips to fit branding)
+
+You may NOT:
+
+- Crop, scale, warp, flip or otherwise distort the logo
+- Heavily modify the logo, such as changing the font used
+- Use the logo or OpenTag3D name to imply endorsement of your product
+
+OpenTag3D has both full-size and small logos available:
+
+[<img src="./assets/images/logo-small.svg" width="80">](./assets/images/logo-small.svg)\| [<img src="./assets/images/logo.svg" width="400">](./assets/images/logo.svg)
+
 ## Previous Considerations
 
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
