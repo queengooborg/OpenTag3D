@@ -75,3 +75,7 @@ Non-voting members are integral to the consortium's ecosystem, contributing idea
 - **Propose Changes**: Submit new ideas or modifications to the specification, which voting members will evaluate and vote on.
 - **Elect Voting Members**: Participate in elections to select voting members through a popular vote, ensuring representation aligns with the community’s vision.
   This dual-tier structure enables broad participation while maintaining an efficient and organized decision-making process.
+
+## Contact
+
+For any questions regarding the standard, please feel free to email queen@gooborg.com.
