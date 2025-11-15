@@ -60,6 +60,12 @@ $sans-serif:
   color: $danger-color;
 }
 
+.announcement {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.25);
+  padding: 0.25em 0;
+}
+
 /* GFM Alerts */
 
 .markdown-alert {

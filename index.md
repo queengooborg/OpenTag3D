@@ -11,6 +11,7 @@ header:
   actions:
     - label: "View Spec"
       url: "/spec"
+  announcement: "Prusa launched the OpenPrintTag standard. [What does this mean for OpenTag3D?](/response-to-openprinttag)"
   caption: "Placeholder Background by [**morgaannn23**](https://wallpapercave.com/w/wp6945227)"
 excerpt: "An open source standard for 3D printer filament RFID tags. Designed for compatibility between printers, filament manufacturers, and accessories, implementation is simple and low-cost."
 intro:
