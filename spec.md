@@ -122,10 +122,11 @@ OpenTag3D has both full-size and small logos available:
 
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
-- NTAG vs MIFARE
-  - NTAG213/215/216 is compatible with smartphones
+- NTAG vs MIFARE vs SLIX2
+  - NTAG213/215/216 are easy to source and compatible with smartphones
   - NTAG216 has slightly more usable memory than MIFARE tags
   - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
+  - SLIX2 tags are a bit harder to source than NTAG
   - The hardware used for reading MIFARE tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
 - JSON vs Memory Map
   - Formats such as JSON (human-readable text) take up considerably more memory than memory mapped
