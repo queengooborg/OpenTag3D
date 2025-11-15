@@ -793,11 +793,11 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
       }
     };
-    document.getElementById("downloadFlipper").onclick = () => {
-      if (!checkMissing()) {
-        downloadFlipperNfc(buf, start, state.tagType);
-      }
-    };
+    // document.getElementById("downloadFlipper").onclick = () => {
+    //   if (!checkMissing()) {
+    //     downloadFlipperNfc(buf, start, state.tagType);
+    //   }
+    // };
     document.getElementById("writeWebNFC").onclick = () => {
       if (!checkMissing()) {
         writeViaWebNFC(buf, state.tagType).catch((e) =>
