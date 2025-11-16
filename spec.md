@@ -132,10 +132,11 @@ OpenTag3D has both full-size and small logos available:
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
 - NTAG vs MIFARE 1K Classic
-  - NTAG213/215/216 are easy to source
+  - NTAG213/215/216 and SLIX2 tags are easy to source
   - NTAG216 has slightly more usable memory than MIFARE tags
+    - This was later determined to not be important, as the core data could be fit within significantly less capacity
   - MIFARE 1K Classic uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
-  - The hardware used for reading MIFARE 1K Classic tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
+  - The hardware used for reading MIFARE 1K Classic tags is typically compatible with NTAG/SLIX2 tags, meaning existing RFID printer hardware would not need replacement
     - In contrast, smartphones can't typically read MIFARE 1K Classic tags
 - JSON vs Memory Map
   - Formats such as JSON (human-readable text) take up considerably more memory than memory mapped
