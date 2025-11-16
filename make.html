@@ -181,7 +181,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     <button class="btn" id="downloadBin">Download .bin</button>
     <!-- <button class="btn" id="downloadFlipper">Download Flipper .nfc</button> -->
     <button class="btn" id="downloadMap">Download address map (.csv)</button>
-    <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn btn--warning" id="loadFileBtn">Load File</button>
     <input
       type="file"
@@ -798,13 +797,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     //     downloadFlipperNfc(buf, start, state.tagType);
     //   }
     // };
-    document.getElementById("writeWebNFC").onclick = () => {
-      if (!checkMissing()) {
-        writeViaWebNFC(buf, state.tagType).catch((e) =>
-          msg("Web NFC error: " + e.message, true),
-        );
-      }
-    };
 
     return { buf, rows, start };
   }
@@ -838,27 +830,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     const m = document.getElementById("messages");
     m.textContent = s;
     m.style.color = isErr ? "var(--error)" : "var(--muted)";
-  }
-
-  // --- Web NFC export (NDEF) ---
-  async function writeViaWebNFC(buf, tagType) {
-    if (!("NDEFReader" in window))
-      throw new Error("Web NFC not supported in this browser");
-    const reader = new NDEFReader();
-    await reader.write({
-      records: [
-        {
-          recordType: "mime",
-          mediaType: "application/vnd.opentag3d.bin",
-          data: buf,
-        },
-        {
-          recordType: "text",
-          data: `OpenTag3D ${tagType} user-memory dump starting at 0x10`,
-        },
-      ],
-    });
-    msg("Wrote NDEF payload to tag");
   }
 
   // --- Flipper Zero export (.nfc minimal dump of user pages) ---
@@ -1204,8 +1175,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
           e.target.value = "";
         }
       });
-
-    document.getElementById("writeWebNFC").disabled = !("NDEFReader" in window);
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       renderForm();
