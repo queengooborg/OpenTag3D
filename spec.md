@@ -18,15 +18,20 @@ Current Version: {{ site.data.spec.version }}
 
 ## Hardware Standard
 
-The OpenTag3D standard is designed to work on the NTAG213/215/216 13.56MHz NFC chips with NDEF records. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
+The OpenTag3D standard is designed to work on any NFC tag that is compliant with the ISO/IEC 14443 Type A communication protocol, is compatible with NDEF Type 2, and has at least 144 bytes of writable capacity. These kinds of tags are plentiful and can be read and written with smartphones and PN532 modules, making them low-cost and easy to integrate.
 
-| Tag Type | Total Capacity | Writable Capacity          | Compatibility   |
-| -------- | -------------- | -------------------------- | --------------- |
-| NTAG213  | 180 bytes      | 144 bytes (120 w/ headers) | Core            |
-| NTAG215  | 540 bytes      | 504 bytes (480 w/ headers) | Core + Extended |
-| NTAG216  | 924 bytes      | 888 bytes (844 w/ headers) | Core + Extended |
+In particular, the standard is tailored towards the NTAG213/215/216 13.56MHz NFC chips. These tags are cheap and common, and have plenty of space to store all of the required and optional information. SLIX2 tags were later added as a compliant option.
+
+| Tag Type | Capacity  | Usable Capacity | Compatibility   |
+| -------- | --------- | --------------- | --------------- |
+| NTAG213  | 144 bytes | 111 bytes       | Core            |
+| SLIX2    | 320 bytes | 287 bytes       | Core + Extended |
+| NTAG215  | 504 bytes | 471 bytes       | Core + Extended |
+| NTAG216  | 888 bytes | 835 bytes       | Core + Extended |
 
 <img src="./assets/images/ntag-sticker.jpg" width="200">
+
+### NTAG vs. MIFARE 1K Classic
 
 NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Bambu Lab AMS uses, for the following reasons:
 
@@ -35,7 +40,7 @@ NFC NTAG213/215/216 was chosen over MIFARE 1K Classic tags, which is what the Ba
 - Non-Encrypted: MF1K uses 25% of its memory to encrypt the data, which is unsuitable for an open source standard
 
 > [!NOTE]
-> Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes, and additional data could be stored within 504 bytes. So, the NTAG213 and NTAG215 were added as cheaper spec-compliant options.
+> Originally, the NTAG216 was specifically selected as it had more usable memory (888 bytes) than the MF1K (768 bytes). However, it was later determined that the core data required for functionality could be stored within 144 bytes, and extra data could be stored within at little as 320 bytes. So, the NTAG213, SLIX2 and NTAG215 were added as cheaper spec-compliant options.
 
 ## Mechanical Standard
 
@@ -50,15 +55,15 @@ The NFC tags should be placed on the spools as follows:
 
 ## Data Structure Standard
 
-This is a list of data that will live on the RFID chip, separated into required and optional data. All **REQUIRED** data must be populated to be compliant with this open source RFID protocol.
+The data is to be stored as a payload within an NDEF record of MIME type `{{ site.data.spec.mime_type }}`. The data must remain unencrypted to be compliant with the spec.
 
-NTAG213 tags have 144 bytes of usable memory, which is the minimum requirement for OpenTag3D. NTAG216 tags have 888 bytes of usable memory.
+NTAG213 tags have 144 bytes of writable memory, which is the minimum requirement for OpenTag3D Core. SLIX2 tags have 320 bytes of writable memory, which is the minimum requirement for OpenTag3D Extended.
 
 All strings are UTF-8 unless specified otherwise. All integers are unsigned, big endian, unless specified otherwise.
 
 Temperatures are stored in Celsius, divided by 5.
 
-The data is to be stored as a payload within an NDEF record of MIME type `{{ site.data.spec.mime_type }}`.
+Below is list of data that will live on the RFID chip. All **REQUIRED** data must be populated to be compliant with the spec.
 
 ### Memory Map - OpenTag3D Core
 
@@ -70,7 +75,7 @@ This is designed to fit within the 144 bytes of writable space on the NTAG213, t
 
 This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields should be populated if available.
 
-This memory address starts just outside the range of NTAG213; an NTAG215/216 must be used to store this data.
+This memory address starts just outside the range of NTAG213; an SLIX2 or larger must be used to store this data.
 
 {% include spec_table.md set="extended" %}
 
@@ -126,12 +131,12 @@ OpenTag3D has both full-size and small logos available:
 
 These are topics that were heavily discussed during the development of OpenTag3D. Below is a quick summary of each topic, and why we decided to settle on the standards we defined.
 
-- NTAG vs MIFARE vs SLIX2
-  - NTAG213/215/216 are easy to source and compatible with smartphones
+- NTAG vs MIFARE 1K Classic
+  - NTAG213/215/216 are easy to source
   - NTAG216 has slightly more usable memory than MIFARE tags
-  - MIFARE uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
-  - SLIX2 tags are a bit harder to source than NTAG
-  - The hardware used for reading MIFARE tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
+  - MIFARE 1K Classic uses about 25% of memory to encrypt data, preventing read/write operations, which is not applicable for OpenTag3D because of the open-source nature
+  - The hardware used for reading MIFARE 1K Classic tags is typically compatible with NTAG tags, meaning existing RFID printer hardware would not need replacement
+    - In contrast, smartphones can't typically read MIFARE 1K Classic tags
 - JSON vs Memory Map
   - Formats such as JSON (human-readable text) take up considerably more memory than memory mapped
     - For example, defining something like Printing Temperature would be `PrintTemp:225` which is 13 bytes, instead of storing a memory mapped 2-byte number. Tokens could be reduced, but that also defeats the purpose of using JSON in the first place, which is often for readability
