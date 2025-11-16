@@ -181,6 +181,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     <button class="btn" id="downloadBin">Download .bin</button>
     <!-- <button class="btn" id="downloadFlipper">Download Flipper .nfc</button> -->
     <button class="btn" id="downloadMap">Download address map (.csv)</button>
+    <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn btn--warning" id="loadFileBtn">Load File</button>
     <input
       type="file"
@@ -198,18 +199,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
 
   <section class="card">
     <div class="pad">
-      <div>
-        <label>Tag type</label>
-        <select id="tagType">
-          <option value="NTAG213" selected>NTAG213 (Core)</option>
-          <option value="NTAG215">NTAG215 (Core + Extended)</option>
-          <option value="NTAG216">NTAG216 (Core + Extended)</option>
-        </select>
-        <div class="help">
-          Determines memory size and whether "extended" fields are included.
-        </div>
-      </div>
-      <div class="flex" style="margin-top: 26px">
+      <div class="flex">
         <button class="btn btn--danger" id="resetBtn">Reset form</button>
         <button class="btn btn--info" id="exampleBtn">Fill examples</button>
       </div>
@@ -231,16 +221,8 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
 </script>
 
 <script>
-  // Known tag capacities (user memory) in bytes
-  const TAG_CAP = {
-    NTAG213: 144, // 0x10..0x9F
-    NTAG215: 504, // 0x10..0x207
-    NTAG216: 888, // 0x10..0x387
-  };
-
   const state = {
     values: new Map(),
-    tagType: "NTAG213",
   };
 
   // --- Utils ---
@@ -311,8 +293,8 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     host.innerHTML = "";
 
     const sections = [
-      { id: "core", title: "Core fields (fit on NTAG213+)" },
-      { id: "extended", title: "Extended fields (NTAG215/216)" },
+      { id: "core", title: "Core" },
+      { id: "extended", title: "Extended" },
     ];
 
     for (const sec of sections) {
@@ -321,13 +303,17 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       const box = h("div", { class: `grid section-${sec.id}` });
       host.append(h("h3", { class: `muted section-${sec.id}` }, sec.title));
       for (const f of def.fields) {
-        if (["tag_format", "tag_version"].includes(f.id)) continue;
-        const row = h("div", { class: "field-row", "data-field": f.id });
+        if (f.id == "tag_version") continue;
+        const row = h("div", {
+          class: "field-row",
+          "data-field": f.id,
+          "data-section": sec.id,
+        });
         const left = h("div");
         const label = h("label", {}, `${f.name}`);
         if (f.required) label.append(h("span", { class: "text--danger" }, "*"));
         left.append(label);
-        left.append(renderInputForField(f));
+        left.append(renderInputForField(f, sec.id));
         row.append(left);
         const meta = h(
           "div",
@@ -350,11 +336,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     }
   }
 
-  function renderInputForField(f) {
+  function renderInputForField(f, section) {
     // Generic by type
     if (f.type === "ascii" || f.type === "utf8") {
       const inp = h("input", {
         id: f.id,
+        "data-section": section,
         type: "text",
         placeholder: f.examples?.[0] || "",
         required: f.required,
@@ -370,19 +357,26 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       const color = h("input", {
         type: "color",
         id: f.id + "_rgb",
+        "data-section": section,
         value: f.id === "color_1" ? "#FFFFFF" : "#000000",
         required: f.required,
       });
       const alpha = h("input", {
         type: "number",
         id: f.id + "_a",
+        "data-section": section,
         min: 0,
         max: 255,
         step: 1,
         value: f.id === "color_1" ? 255 : 0,
         required: f.required,
       });
-      const out = h("input", { type: "hidden", id: f.id, readonly: true });
+      const out = h("input", {
+        type: "hidden",
+        id: f.id,
+        "data-section": section,
+        readonly: true,
+      });
       const update = () => {
         const alphaValue = parseInt(alpha.value || "255", 10);
         const hex = color.value + alphaValue.toString(16).padStart(2, "0");
@@ -407,6 +401,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int" && f.id === "target_diameter") {
       const mm = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         step: "0.001",
@@ -442,6 +437,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     ) {
       const c = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         step: 5,
@@ -468,6 +464,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int" && ["mfi_load", "mfi_value"].includes(f.id)) {
       const mfi = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         step: "0.1",
@@ -497,6 +494,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int" && f.id === "density") {
       const gcm3 = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         step: "0.001",
@@ -522,6 +520,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int" && f.length === 2) {
       const inp = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         step: "1",
@@ -537,6 +536,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int" && f.length === 1) {
       const inp = h("input", {
         id: f.id,
+        "data-section": section,
         type: "number",
         min: 0,
         max: 255,
@@ -551,7 +551,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       return inp;
     }
     if (f.type === "int[4]" && f.id === "mfg_date") {
-      const inp = h("input", { id: f.id, type: "date", required: f.required });
+      const inp = h("input", {
+        id: f.id,
+        "data-section": section,
+        type: "date",
+        required: f.required,
+      });
       const sync = () => {
         state.values.set(f.id, inp.value);
         buildMemory();
@@ -563,6 +568,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     if (f.type === "int[3]" && f.id === "mfg_time") {
       const inp = h("input", {
         id: f.id,
+        "data-section": section,
         type: "time",
         step: 1,
         required: f.required,
@@ -579,6 +585,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     // Fallback integer/text
     const inp = h("input", {
       id: f.id,
+      "data-section": section,
       type: "text",
       placeholder: f.examples?.[0] ?? "",
       required: f.required,
@@ -590,47 +597,56 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     return inp;
   }
 
-  function enableSections() {
-    document
-      .querySelectorAll(".section-extended")
-      .forEach((el) => (el.hidden = state.tagType === "NTAG213"));
-  }
-
   // --- Building ---
-  function addrRangeForTag(tag) {
-    const bytes = TAG_CAP[tag];
-    const start = parseHex(SPEC.core.address_range.start); // 0x10
-    const end = start + bytes - 1;
-    return [start, end];
+  function hasExtendedSet() {
+    const els = document.querySelectorAll("[data-section='extended']");
+    for (const el of els) {
+      if (el.value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function hexdump(buf, startAddr) {
     const lines = [];
-    for (let i = 0; i < buf.length; i += 16) {
-      const addr = startAddr + i;
+    for (let i = startAddr; i < buf.length; i += 16) {
       const slice = buf.subarray(i, i + 16);
       const hexs = [...slice].map((b) => hex(b)).join(" ");
       const ascii = [...slice]
         .map((b) => (b >= 32 && b <= 126 ? String.fromCharCode(b) : "."))
         .join("");
-      lines.push(
-        `${addrHex(addr)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`,
-      );
+      lines.push(`${addrHex(i)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`);
     }
     return lines.join("\n");
   }
 
   function buildMemory() {
-    const [start, end] = addrRangeForTag(state.tagType);
+    const ndefHeaderBytes = [
+      0x77, 0x48, 0x00, 0x00, 0xe1, 0x11, 0x3e, 0x00, 0x03, 0x90, 0xd2, 0x15,
+      0x78,
+    ];
+
+    let extended = hasExtendedSet();
+
+    const start = 0x08 + ndefHeaderBytes.length + SPEC.mime_type.length;
+    const end =
+      parseHex(SPEC[extended ? "extended" : "core"].address_range.end) + start;
     const size = end - start + 1;
     const buf = new Uint8Array(size);
     buf.fill(0x00);
 
-    const fields = [...SPEC.core.fields.map((f) => ({ set: "core", ...f }))];
-    if (state.tagType !== "NTAG213" && SPEC.extended)
-      fields.push(
-        ...SPEC.extended.fields.map((f) => ({ set: "extended", ...f })),
-      );
+    // NDEF header stuff
+    buf.set(ndefHeaderBytes, 0x08);
+    buf.set(
+      encodeAscii(SPEC.mime_type, SPEC.mime_type.length),
+      0x08 + ndefHeaderBytes.length,
+    );
+
+    const fields = [];
+    for (const set of extended ? ["core", "extended"] : ["core"]) {
+      fields.push(...SPEC[set].fields.map((f) => ({ set, ...f })));
+    }
 
     // --- required validation helpers ---
     const isPresent = (f, val) => {
@@ -646,7 +662,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       return val !== undefined && val !== null && String(val).length > 0;
     };
 
-    state.values.set("tag_format", "OT");
     state.values.set(
       "tag_version",
       Math.round(parseFloat(SPEC.version) * 1000),
@@ -668,7 +683,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     const rows = [];
     const be = true; // big-endian storage for multi-byte ints
     const push = (f, addr, bytes, note = "") => {
-      const offset = addr - start;
+      const offset = addr + start;
       if (offset < 0 || offset + bytes.length > buf.length) {
         rows.push([
           f.name,
@@ -781,22 +796,31 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       }
     };
 
+    const filename = `OpenTag3D_${state.values.get("manufacturer")}_${state.values.get("color_name")}`;
+
     // Wire export actions (fresh closures)
     document.getElementById("downloadBin").onclick = () => {
       if (!checkMissing()) {
-        downloadBin(buf, `opentag_${state.tagType.toLowerCase()}.bin`);
+        downloadBin(buf, `${filename}.bin`);
       }
     };
     document.getElementById("downloadMap").onclick = () => {
       if (!checkMissing()) {
-        downloadMap(rows, `opentag_${state.tagType.toLowerCase()}_map.csv`);
+        downloadMap(rows, `${filename}_map.csv`);
       }
     };
     // document.getElementById("downloadFlipper").onclick = () => {
     //   if (!checkMissing()) {
-    //     downloadFlipperNfc(buf, start, state.tagType);
+    //     downloadFlipperNfc(buf, start, `${filename}.nfc`);
     //   }
     // };
+    document.getElementById("writeWebNFC").onclick = () => {
+      if (!checkMissing()) {
+        writeViaWebNFC(buf, state.tagType).catch((e) =>
+          msg("Web NFC error: " + e.message, true),
+        );
+      }
+    };
 
     return { buf, rows, start };
   }
@@ -832,27 +856,64 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     m.style.color = isErr ? "var(--error)" : "var(--muted)";
   }
 
+  // --- Web NFC export (NDEF) ---
+  async function writeViaWebNFC(buf) {
+    if (!("NDEFReader" in window)) {
+      throw new Error("Web NFC is not supported in this browser");
+    }
+    msg("Waiting to write tag...");
+    const reader = new NDEFReader();
+    await reader.write({
+      records: [
+        {
+          recordType: "mime",
+          mediaType: "{{ site.data.spec.mime_type }}",
+          data: buf,
+        },
+      ],
+    });
+    msg("Wrote NDEF payload to tag");
+  }
+
   // --- Flipper Zero export (.nfc minimal dump of user pages) ---
-  function downloadFlipperNfc(buf, startAddr, tagType) {
+  function downloadFlipperNfc(buf, startAddr, name) {
     const header = [
       "Filetype: Flipper NFC device",
       "Version: 4",
-      "Device type: NTAG",
-      `Comment: OpenTag3D ${tagType} user memory dump (0x10..)`,
+      "# Device type can be ISO14443-3A, ISO14443-3B, ISO14443-4A, ISO14443-4B, ISO15693-3, FeliCa, NTAG/Ultralight, Mifare Classic, Mifare Plus, Mifare DESFire, SLIX, ST25TB",
+      "Device type: NTAG/Ultralight",
+      "# UID is common for all formats",
+      "UID: 00 00 00 00 00 00",
+      "# ISO14443-3A specific data",
+      "ATQA: 00 44",
+      "SAK: 00",
+      "# NTAG/Ultralight specific data",
+      "Data format version: 2",
+      "NTAG/Ultralight type: NTAG215",
+      "Signature: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00",
+      "Mifare version: 00 04 04 02 01 00 11 03",
+      "Counter 0: 0",
+      "Tearing 0: 00",
+      "Counter 1: 0",
+      "Tearing 1: 00",
+      "Counter 2: 0",
+      "Tearing 2: 00",
+      "Pages total: 135",
+      "Pages read: 135",
     ];
     // Build page-aligned dump for user area only (each page = 4 bytes)
     const lines = [];
     for (let off = 0; off < buf.length; off += 4) {
-      const page = (startAddr + off) & 0xff; // lower byte for display
+      const page = off / 4; // lower byte for display
       const slice = buf.subarray(off, off + 4);
       const b = [...slice].map((x) => hex(x)).join(" ");
-      lines.push(`Page ${hex(page, 2)}: ${b}`);
+      lines.push(`Page ${page}: ${b}`);
     }
     const content = header.concat(lines).join("\n") + "\n";
     const blob = new Blob([content], { type: "text/plain" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `opentag_${tagType.toLowerCase()}.nfc`;
+    a.download = name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -950,10 +1011,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       el.dispatchEvent(new Event("input", { bubbles: true }));
     };
 
-    const allFields = [
-      ...SPEC.core.fields,
-      ...(SPEC.extended ? SPEC.extended.fields : []),
-    ];
+    const allFields = [...SPEC.core.fields, ...SPEC.extended.fields];
     for (const f of allFields) {
       const addr = parseHex(f.start);
       const bytes = read(addr, f.length);
@@ -1070,27 +1128,16 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     state.values.set("density", 1240);
     assert("1.240 g/cm³ → 1240 µg/cm³", state.values.get("density") === 1240);
 
-    // Buffer size by tag type
-    state.tagType = "NTAG213";
-    let r = buildMemory();
-    assert("NTAG213 size", r.buf.length === TAG_CAP.NTAG213);
-    state.tagType = "NTAG215";
-    r = buildMemory();
-    assert("NTAG215 size", r.buf.length === TAG_CAP.NTAG215);
-    state.tagType = "NTAG216";
-    r = buildMemory();
-    assert("NTAG216 size", r.buf.length === TAG_CAP.NTAG216);
-
     // Parser tests
     const sampleHex =
-      "0x10  00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF  |................|\n0x20  01 02 03 04";
+      "0x00  00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF  |................|\n0x00  01 02 03 04";
     const parsedA = parseBytesFromText(sampleHex);
     assert(
       "Parse app hexdump",
       parsedA.data.length >= 20 && parsedA.startAddr === 0x10,
     );
 
-    const sampleFlipper = "Page 10: AA BB CC DD\nPage 11: 01 02 03 04";
+    const sampleFlipper = "Page 0: AA BB CC DD\nPage 1: 01 02 03 04";
     const parsedB = parseBytesFromText(sampleFlipper);
     assert(
       "Parse flipper pages",
@@ -1110,14 +1157,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
   // --- Init ---
   window.addEventListener("DOMContentLoaded", () => {
     renderForm();
-    enableSections();
     buildMemory();
-
-    document.getElementById("tagType").addEventListener("change", (e) => {
-      state.tagType = e.target.value;
-      enableSections();
-      buildMemory();
-    });
 
     document.getElementById("exampleBtn").addEventListener("click", () => {
       const setIf = (id, v) => {
@@ -1140,8 +1180,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       setIf("target_diameter", 1.75);
       setIf("density", 1.24);
       setIf("target_weight", 1000);
-      setIf("mfg_date", new Date().toISOString().slice(0, 10));
-      setIf("mfg_time", new Date().toISOString().slice(11, 19));
 
       buildMemory();
     });
@@ -1175,6 +1213,8 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
           e.target.value = "";
         }
       });
+
+    document.getElementById("writeWebNFC").disabled = !("NDEFReader" in window);
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       renderForm();

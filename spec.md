@@ -9,15 +9,22 @@ description: The details of the OpenTag3D specification.
 
 Current Version: {{ site.data.spec.version }}
 
+> [!NOTE]
+> In v0.005 of the standard, all of the tag data was memory mapped in order to maximize space. However, many devices did not like the lack of NDEF records, including the Web NFC writer. For improved convenience and support, v0.010 of the standard now utilizes NDEF records.
+>
+> Since the NDEF record headers take up additional space on the tag, the online URL field was moved from Core to Extended. Given that the online URL is for advanced data anyways, this felt like a reasonable compromise.
+>
+> Additionally, in v0.005, all unpopulated fields in the Extended data format would have to be populated with a "-1" in binary (or 0xFFFFFFFFFFFFFFFF). To help preserve free space in v0.010, unpopulated fields can now be left as 0x00.
+
 ## Hardware Standard
 
-The OpenTag3D standard is designed for the NTAG213/215/216 13.56MHz NFC chips. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
+The OpenTag3D standard is designed to work on the NTAG213/215/216 13.56MHz NFC chips with NDEF records. These tags are cheap and common, and have plenty of space to store the required information. NFC tags can be read/written with smartphones. 13.56 MHz RFID modules are plentiful, low-cost and Arduino-compatible, allowing for easy integration.
 
-| Tag Type | Capacity  | Compatibility   |
-| -------- | --------- | --------------- |
-| NTAG213  | 144 bytes | Core            |
-| NTAG215  | 504 bytes | Core + Extended |
-| NTAG216  | 888 bytes | Core + Extended |
+| Tag Type | Total Capacity | Writable Capacity          | Compatibility   |
+| -------- | -------------- | -------------------------- | --------------- |
+| NTAG213  | 180 bytes      | 144 bytes (120 w/ headers) | Core            |
+| NTAG215  | 540 bytes      | 504 bytes (480 w/ headers) | Core + Extended |
+| NTAG216  | 924 bytes      | 888 bytes (844 w/ headers) | Core + Extended |
 
 <img src="./assets/images/ntag-sticker.jpg" width="200">
 
@@ -51,6 +58,8 @@ All strings are UTF-8 unless specified otherwise. All integers are unsigned, big
 
 Temperatures are stored in Celsius, divided by 5.
 
+The data is to be stored as a payload within an NDEF record of MIME type `{{ site.data.spec.mime_type }}`.
+
 ### Memory Map - OpenTag3D Core
 
 This is designed to fit within the 144 bytes of writable space on the NTAG213, the smallest and cheapest variant of compatible tags.
@@ -59,9 +68,7 @@ This is designed to fit within the 144 bytes of writable space on the NTAG213, t
 
 ### Memory Map - OpenTag3D Extended
 
-This is additional data that not all manufacturers will implement, typically due to technological restrictions.
-
-These fields should be populated if available. All unused fields must be populated with "-1" (all 1's in binary, eg 0xFFFFFFFFFFFFFFFF).
+This is additional data that not all manufacturers will implement, typically due to technological restrictions. These fields should be populated if available.
 
 This memory address starts just outside the range of NTAG213; an NTAG215/216 must be used to store this data.
 
@@ -72,7 +79,7 @@ This memory address starts just outside the range of NTAG213; an NTAG215/216 mus
 Sometimes a filament manufacturer may want to include supplemental data for advanced users that doesn't fit or otherwise cannot be stored on the RFID tag itself. One example is a diameter graph, which is too much data to be stored within only 888 bytes of memory. OpenTag3D defines a field for a "web API" URL which can be used to look up this information.
 
 > [!NOTE]
-> The web API will only be used for advanced supplemental data and will never be used for critical information required by printers in order to print the material properly.
+> The web API will only be used for advanced supplemental data, or data that requires an internet connection to use anyways, and will **NEVER** be used for critical information required by printers in order to print the material properly.
 
 At this time, the web API is only a placeholder for future implementation, as the OpenTag3D specification has not determined what information should be included in the web API standard. For now, it only defines the structure.
 
@@ -90,12 +97,9 @@ The URL should respond with the following JSON:
 
 While every implementation for reading OpenTag3D RFID tags will be different, this specification aims to set a few requirements to ensure that functionality is consistent across printers and other hardware -- we'll call these the "reader" for continuity.
 
-When attempting to read an RFID tag, the reader should check for the presence of the tag format field and check if it is "OT" (0x4F54). If it is not set to "OT", it is not an OpenTag3D tag.
+When attempting to read an RFID tag, the reader should check for an NDEF record of the type `{{ site.data.spec.mime_type }}`. This record will include all of the tag data. It may ignore any other NDEF records. If there is no `{{ site.data.spec.mime_type }}` record, it is not an OpenTag3D tag.
 
 The reader should then check the tag version. If the tag version is a newer _minor_ version than the reader expects, display a warning to the user and attempt to parse anyways. If the tag version is a newer _major_ version, the reader should display an error to the user and not attempt to parse the data.
-
-> [!CAUTION]
-> During the early beta of the tag format, it should be assumed that any and every version update is a major version. Once v1.000 of the tag specification is released, this caution note will no longer apply.
 
 ## Branding Guidelines
 
