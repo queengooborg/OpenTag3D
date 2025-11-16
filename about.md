@@ -78,4 +78,4 @@ Non-voting members are integral to the consortium's ecosystem, contributing idea
 
 ## Contact
 
-For any questions regarding the standard, please feel free to email queen@gooborg.com.
+For any questions regarding the standard, please feel free to email [queen@gooborg.com](mailto:queen@gooborg.com).
