@@ -632,8 +632,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     const start = 0x08 + ndefHeaderBytes.length + SPEC.mime_type.length;
     const end =
       parseHex(SPEC[extended ? "extended" : "core"].address_range.end) + start;
-    const size = end - start + 1;
-    const buf = new Uint8Array(size);
+    const buf = new Uint8Array(end + 1);
     buf.fill(0x00);
 
     // NDEF header stuff
@@ -687,16 +686,18 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       if (offset < 0 || offset + bytes.length > buf.length) {
         rows.push([
           f.name,
+          f.id,
           addrHex(addr),
           f.length,
           "-",
-          `Out of range for ${state.tagType}`,
+          `Out of range: ${offset} > ${buf.length}`,
         ]);
         return;
       }
       buf.set(bytes, offset);
       rows.push([
         f.name,
+        f.id,
         addrHex(addr),
         bytes.length,
         [...bytes].map((b) => hex(b)).join(" "),
@@ -834,7 +835,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
   function downloadMap(rows, name) {
-    const head = ["Field", "Address", "Length", "Bytes", "Notes"];
+    const head = ["Field", "ID", "Address", "Length", "Bytes", "Notes"];
     const csv = [head.join(",")]
       .concat(
         rows.map((r) =>
