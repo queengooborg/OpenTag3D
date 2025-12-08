@@ -608,7 +608,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     return false;
   }
 
-  function hexdump(buf, startAddr) {
+  function hexdump(buf, startAddr = 0x00) {
     const lines = [];
     for (let i = startAddr; i < buf.length; i += 16) {
       const slice = buf.subarray(i, i + 16);
@@ -622,25 +622,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
   }
 
   function buildMemory() {
-    const ndefHeaderBytes = [
-      0x77, 0x48, 0x00, 0x00, 0xe1, 0x11, 0x3e, 0x00, 0x03, 0x90, 0xd2, 0x15,
-      0x78,
-    ];
-
     let extended = hasExtendedSet();
 
-    const start = 0x08 + ndefHeaderBytes.length + SPEC.mime_type.length;
-    const end =
-      parseHex(SPEC[extended ? "extended" : "core"].address_range.end) + start;
-    const buf = new Uint8Array(end + 1);
+    const size =
+      parseHex(SPEC[extended ? "extended" : "core"].address_range.end) + 1;
+    const buf = new Uint8Array(size + 1);
     buf.fill(0x00);
-
-    // NDEF header stuff
-    buf.set(ndefHeaderBytes, 0x08);
-    buf.set(
-      encodeAscii(SPEC.mime_type, SPEC.mime_type.length),
-      0x08 + ndefHeaderBytes.length,
-    );
 
     const fields = [];
     for (const set of extended ? ["core", "extended"] : ["core"]) {
@@ -682,19 +669,18 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     const rows = [];
     const be = true; // big-endian storage for multi-byte ints
     const push = (f, addr, bytes, note = "") => {
-      const offset = addr + start;
-      if (offset < 0 || offset + bytes.length > buf.length) {
+      if (addr < 0 || addr + bytes.length > buf.length) {
         rows.push([
           f.name,
           f.id,
           addrHex(addr),
           f.length,
           "-",
-          `Out of range: ${offset} > ${buf.length}`,
+          `Out of range: ${addr} > ${buf.length}`,
         ]);
         return;
       }
-      buf.set(bytes, offset);
+      buf.set(bytes, addr);
       rows.push([
         f.name,
         f.id,
@@ -782,7 +768,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     }
 
     // Update hexdump
-    document.getElementById("hexdump").textContent = hexdump(buf, start);
+    document.getElementById("hexdump").textContent = hexdump(buf);
 
     const checkMissing = () => {
       if (missing.length > 0) {
@@ -823,7 +809,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       }
     };
 
-    return { buf, rows, start };
+    return { buf, rows };
   }
 
   function downloadBin(buf, name) {
@@ -902,11 +888,29 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       "Pages total: 135",
       "Pages read: 135",
     ];
+
+    const ndefHeaderBytes = [
+      0x77, 0x48, 0x00, 0x00, 0xe1, 0x11, 0x3e, 0x00, 0x03, 0x90, 0xd2, 0x15,
+      0x78,
+    ];
+
+    const offset = 0x08 + ndefHeaderBytes.length + SPEC.mime_type.length;
+    const newbuf = new Uint8Array(offset + buf.length + 1);
+    newbuf.fill(0x00);
+
+    // NDEF header stuff
+    newbuf.set(ndefHeaderBytes, 0x08);
+    newbuf.set(
+      encodeAscii(SPEC.mime_type, SPEC.mime_type.length),
+      0x08 + ndefHeaderBytes.length,
+    );
+    newbuf.set(buf, offset);
+
     // Build page-aligned dump for user area only (each page = 4 bytes)
     const lines = [];
-    for (let off = 0; off < buf.length; off += 4) {
+    for (let off = 0; off < newbuf.length; off += 4) {
       const page = off / 4; // lower byte for display
-      const slice = buf.subarray(off, off + 4);
+      const slice = newbuf.subarray(off, off + 4);
       const b = [...slice].map((x) => hex(x)).join(" ");
       lines.push(`Page ${page}: ${b}`);
     }
@@ -1200,8 +1204,8 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         try {
           if (f.name.toLowerCase().endsWith(".bin")) {
             const buf = new Uint8Array(await f.arrayBuffer());
-            loadBufferIntoForm(buf, 0x10); // assume user memory starts at 0x10
-            msg("Loaded .bin (assumed start 0x10)");
+            loadBufferIntoForm(buf, 0x00);
+            msg("Loaded .bin");
           } else {
             const text = await f.text();
             const { startAddr, data } = parseBytesFromText(text);
