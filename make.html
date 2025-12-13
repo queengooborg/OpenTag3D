@@ -1055,6 +1055,11 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     const allFields = [...SPEC.core.fields, ...SPEC.extended.fields];
     for (const f of allFields) {
       const addr = parseHex(f.start);
+
+      if (addr > data.length) {
+        break;
+      }
+
       const bytes = read(addr, f.length);
 
       try {
@@ -1064,12 +1069,14 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         } else if (f.type === "rgba") {
           const [r = 0, g = 0, b = 0, a = 255] = bytes;
           const color = document.getElementById(f.id + "_rgb");
-          if (color)
+          if (color) {
             color.value =
               "#" +
               [r, g, b]
                 .map((x) => x.toString(16).toUpperCase().padStart(2, "0"))
                 .join("");
+            color.dispatchEvent(new Event("input", { bubbles: true }));
+          }
           const alpha = document.getElementById(f.id + "_a");
           if (alpha) alpha.value = a;
           const out = document.getElementById(f.id);
