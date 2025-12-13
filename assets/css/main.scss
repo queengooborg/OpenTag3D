@@ -66,6 +66,11 @@ $sans-serif:
   padding: 0.25em 0;
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* GFM Alerts */
 
 .markdown-alert {
