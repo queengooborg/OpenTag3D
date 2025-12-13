@@ -183,6 +183,9 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     <button class="btn" id="downloadMap">Download address map (.csv)</button>
     <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn btn--warning" id="loadFileBtn">Load File</button>
+    <button class="btn btn--warning" id="readWebNFC" disabled>
+      Read via Web NFC
+    </button>
     <input
       type="file"
       id="uploadFile"
@@ -864,6 +867,36 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     msg("Wrote NDEF payload to tag");
   }
 
+  async function readViaWebNFC() {
+    if (!("NDEFReader" in window)) {
+      throw new Error("Web NFC is not supported in this browser");
+    }
+
+    msg("Waiting to read tag...");
+
+    const controller = new AbortController();
+    const reader = new NDEFReader();
+    await reader.scan({ signal: controller.signal });
+    reader.onreading = (event) => {
+      controller.abort();
+      let found = false;
+      for (const record of event.message.records) {
+        if (record.recordType == "mime" && record.mediaType == SPEC.mime_type) {
+          found = true;
+          msg("Found and loaded OpenTag3D record");
+          loadBufferIntoForm(record.data.buffer, 0x00);
+          break;
+        }
+      }
+      if (!found) {
+        msg("Read tag does not have any OpenTag3D records", true);
+      }
+    };
+    reader.onreadingerror = (event) => {
+      msg("Error reading tag, try again or try another tag", true);
+    };
+  }
+
   // --- Flipper Zero export (.nfc minimal dump of user pages) ---
   function downloadFlipperNfc(buf, startAddr, name) {
     const header = [
@@ -1167,6 +1200,10 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     renderForm();
     buildMemory();
 
+    window.onerror = (message) => {
+      msg("Error: " + message, true);
+    };
+
     document.getElementById("exampleBtn").addEventListener("click", () => {
       const setIf = (id, v) => {
         const el = document.getElementById(id);
@@ -1222,7 +1259,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         }
       });
 
+    document.getElementById("readWebNFC").onclick = () => {
+      readViaWebNFC();
+    };
+
     document.getElementById("writeWebNFC").disabled = !("NDEFReader" in window);
+    document.getElementById("readWebNFC").disabled = !("NDEFReader" in window);
 
     document.getElementById("resetBtn").addEventListener("click", () => {
       renderForm();
