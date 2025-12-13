@@ -837,10 +837,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
-  function msg(s, isErr = false) {
+  function msg(message, isErr = false) {
     const m = document.getElementById("messages");
-    m.textContent = s;
+    m.textContent = message;
     m.style.color = isErr ? "var(--error)" : "var(--muted)";
+
+    (isErr ? console.error : console.log)(message);
   }
 
   // --- Web NFC export (NDEF) ---
@@ -1000,13 +1002,14 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
 
   // Decode imported buffer back into the form (reverse the human↔stored scalings where we can).
   function loadBufferIntoForm(buf, startAddr) {
-    document.getElementById("hexdump").textContent = hexdump(buf, startAddr);
+    const data = new Uint8Array(buf);
+    document.getElementById("hexdump").textContent = hexdump(data, startAddr);
 
     const parseHex = (s) => (typeof s === "number" ? s : parseInt(s, 16));
     const read = (addr, len) => {
       const off = addr - startAddr;
-      if (off < 0 || off + len > buf.length) return new Uint8Array(len);
-      return buf.subarray(off, off + len);
+      if (off < 0 || off + len > data.length) return new Uint8Array(len);
+      return data.subarray(off, off + len);
     };
     const readInt = (bytes) => bytes.reduce((n, b) => (n << 8) | b, 0) >>> 0;
     const setVal = (id, val) => {
@@ -1203,7 +1206,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         if (!f) return;
         try {
           if (f.name.toLowerCase().endsWith(".bin")) {
-            const buf = new Uint8Array(await f.arrayBuffer());
+            const buf = await f.arrayBuffer();
             loadBufferIntoForm(buf, 0x00);
             msg("Loaded .bin");
           } else {
