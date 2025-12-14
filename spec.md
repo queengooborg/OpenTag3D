@@ -86,17 +86,34 @@ Sometimes a filament manufacturer may want to include supplemental data for adva
 > [!NOTE]
 > The web API will only be used for advanced supplemental data, or data that requires an internet connection to use anyways, and will **NEVER** be used for critical information required by printers in order to print the material properly.
 
-At this time, the web API is only a placeholder for future implementation, as the OpenTag3D specification has not determined what information should be included in the web API standard. For now, it only defines the structure.
-
 The "Online Data URL" field should be populated with the URL that responds with the web API data. The URL must return JSON data when the `Accept` HTTP header is set to `application/json`. Implementers are welcome to create a user-friendly UI if the `Accept` header is set to anything else, but it _must_ return JSON format if the client calls for it.
 
-The URL should respond with the following JSON:
+The URL should respond with JSON formatted like the following:
 
 ```json
 {
-  "opentag_version": "{{ site.data.spec.version }}"
+  "opentag_version": "{{ site.data.spec.version }}",
+  "price": {
+    "us": "$15.99",
+    "eu": "€14.99",
+    "uk": "£16.99",
+    "global": "$15.99"
+  },
+  "product_url": {
+    "us": [
+      "https://www.amazon.com/dp/*",
+      "https://example.com/filament-manufacturer-website"
+    ],
+    "eu": ["https://example.com"]
+  }
 }
 ```
+
+The `opentag_version` must be set as the current OpenTag3D version the API has been updated to support.
+
+The `price` field should be the current prices for the material and color, separated by country or region. Each country or region should be represented by its two-letter ISO 3166-1 code, including any exceptional reservations such as EU for European Union. A `global` area may be defined as well.
+
+The `product_url` field should be links to product pages where the user can repurchase the filament, separated by country or region. The representations of countries/regions will be identical to that of the `price` field. For each country/region, a list of URLs may be specified in order to provide multiple places the user can buy new filament. The order of URLs may be specified however the filament maker desires. (Implementers should honor the filament maker's ordering.)
 
 ## Reader Implementation Guidelines
 
