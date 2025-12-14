@@ -174,7 +174,7 @@
         "scaling": 0.001,
         "examples": [1240, 3900],
         "required": true,
-        "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`."
+        "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`. (Recommendations: 1.24 for PLA, 1.07 for ABS, 1.27 for PETG)"
       }
     ]
   },
