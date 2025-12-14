@@ -1063,7 +1063,17 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       const bytes = read(addr, f.length);
 
       try {
-        if (f.type === "ascii" || f.type === "utf8") {
+        if (f.id === "tag_version") {
+          const v = readInt(bytes) / 1000.0;
+          const ev = parseFloat(SPEC.version);
+          console.log(f, v, ev);
+          if (v / 1000 != ev) {
+            msg(
+              `Warning: loaded tag version is mismatched (got ${v}, expected ${ev})`,
+              true,
+            );
+          }
+        } else if (f.type === "ascii" || f.type === "utf8") {
           const s = String.fromCharCode(...bytes).replace(/\u0000+$/, "");
           setVal(f.id, s);
         } else if (f.type === "rgba") {
@@ -1148,8 +1158,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         /* be forgiving on decode */
       }
     }
-
-    msg("Imported buffer applied to form");
   }
 
   // --- Simple built-in tests ---
@@ -1251,13 +1259,13 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         try {
           if (f.name.toLowerCase().endsWith(".bin")) {
             const buf = await f.arrayBuffer();
-            loadBufferIntoForm(buf, 0x00);
             msg("Loaded .bin");
+            loadBufferIntoForm(buf, 0x00);
           } else {
             const text = await f.text();
             const { startAddr, data } = parseBytesFromText(text);
-            loadBufferIntoForm(data, startAddr);
             msg(`Loaded dump (start ${addrHex(startAddr)})`);
+            loadBufferIntoForm(data, startAddr);
           }
         } catch (err) {
           msg("Import error: " + err.message, true);
