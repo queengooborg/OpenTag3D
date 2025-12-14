@@ -539,38 +539,22 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       sync();
       return td;
     }
-    if (f.type === "int" && f.length === 2) {
+    if (f.type === "int") {
       const inp = h("input", {
         id: f.id,
         "data-section": section,
         type: "number",
         min: 0,
+        max: 255 * length,
         step: "1",
-        placeholder: f.examples?.[0] ?? "",
+        placeholder: f.examples?.[0] * (f.scaling || 1) ?? "",
         required: f.required,
       });
       inp.addEventListener("input", () => {
         state.values.set(
           f.id,
-          Math.round(parseFloat(inp.value || "0") / f.scaling),
+          Math.round(parseFloat(inp.value || "0") / (f.scaling || 1)),
         );
-        buildMemory();
-      });
-      return inp;
-    }
-    if (f.type === "int" && f.length === 1) {
-      const inp = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        max: 255,
-        step: "1",
-        placeholder: f.examples?.[0] ?? "",
-        required: f.required,
-      });
-      inp.addEventListener("input", () => {
-        state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
         buildMemory();
       });
       return inp;
