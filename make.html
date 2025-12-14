@@ -520,6 +520,25 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       box.append(gcm3, hint);
       return box;
     }
+    if (f.type === "int" && f.id === "td") {
+      const td = h("input", {
+        id: f.id,
+        "data-section": section,
+        type: "number",
+        min: 0,
+        step: "0.1",
+        placeholder: "11.8",
+        required: f.required,
+      });
+      const sync = () => {
+        const ug = Math.round(parseFloat(td.value || "0") * 10);
+        state.values.set(f.id, ug);
+        buildMemory();
+      };
+      td.addEventListener("input", sync);
+      sync();
+      return td;
+    }
     if (f.type === "int" && f.length === 2) {
       const inp = h("input", {
         id: f.id,
@@ -531,7 +550,10 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         required: f.required,
       });
       inp.addEventListener("input", () => {
-        state.values.set(f.id, Math.round(parseFloat(inp.value || "0")));
+        state.values.set(
+          f.id,
+          Math.round(parseFloat(inp.value || "0") / f.scaling),
+        );
         buildMemory();
       });
       return inp;
@@ -1240,6 +1262,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       setIf("target_diameter", 1.75);
       setIf("density", 1.24);
       setIf("target_weight", 1000);
+      setIf("td", 11.8);
 
       buildMemory();
     });

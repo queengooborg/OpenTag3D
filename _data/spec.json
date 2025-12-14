@@ -179,13 +179,14 @@
       {
         "name": "Transmission Distance (TD)",
         "id": "td",
-        "unit": "µm",
+        "unit": "mm",
         "type": "int",
         "start": "0x64",
         "length": 2,
         "usage": "operational",
-        "examples": [2540],
-        "description": "Opaque thickness in µm (micrometers)."
+        "scaling": 0.1,
+        "examples": [118],
+        "description": "Opaque thickness in millimeters."
       }
     ]
   },
