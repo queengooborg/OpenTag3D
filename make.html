@@ -180,7 +180,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
   <div id="controls">
     <button class="btn" id="downloadBin">Download .bin</button>
     <!-- <button class="btn" id="downloadFlipper">Download Flipper .nfc</button> -->
-    <button class="btn" id="downloadMap">Download address map (.csv)</button>
+    <!-- <button class="btn" id="downloadMap">Download address map (.csv)</button> -->
     <button class="btn" id="writeWebNFC" disabled>Write via Web NFC</button>
     <button class="btn btn--warning" id="loadFileBtn">Load File</button>
     <button class="btn btn--warning" id="readWebNFC" disabled>
@@ -794,11 +794,11 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         downloadBin(buf, `${filename}.bin`);
       }
     };
-    document.getElementById("downloadMap").onclick = () => {
-      if (!checkMissing()) {
-        downloadMap(rows, `${filename}_map.csv`);
-      }
-    };
+    // document.getElementById("downloadMap").onclick = () => {
+    //   if (!checkMissing()) {
+    //     downloadMap(rows, `${filename}_map.csv`);
+    //   }
+    // };
     // document.getElementById("downloadFlipper").onclick = () => {
     //   if (!checkMissing()) {
     //     downloadFlipperNfc(buf, start, `${filename}.nfc`);
@@ -1257,16 +1257,9 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         const f = e.target.files?.[0];
         if (!f) return;
         try {
-          if (f.name.toLowerCase().endsWith(".bin")) {
-            const buf = await f.arrayBuffer();
-            msg("Loaded .bin");
-            loadBufferIntoForm(buf, 0x00);
-          } else {
-            const text = await f.text();
-            const { startAddr, data } = parseBytesFromText(text);
-            msg(`Loaded dump (start ${addrHex(startAddr)})`);
-            loadBufferIntoForm(data, startAddr);
-          }
+          const buf = await f.arrayBuffer();
+          msg("Loaded .bin file");
+          loadBufferIntoForm(buf, 0x00);
         } catch (err) {
           msg("Import error: " + err.message, true);
         } finally {
