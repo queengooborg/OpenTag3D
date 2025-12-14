@@ -204,7 +204,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
     <div class="pad">
       <div class="flex">
         <button class="btn btn--danger" id="resetBtn">Reset form</button>
-        <button class="btn btn--info" id="exampleBtn">Fill examples</button>
+        <button class="btn btn--info" id="exampleBtn">
+          Fill placeholders (core only)
+        </button>
+        <button class="btn btn--info" id="allExampleBtn">
+          Fill placeholders (all data)
+        </button>
       </div>
       <div class="divider"></div>
       <div id="formHost">
@@ -340,13 +345,24 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
   }
 
   function renderInputForField(f, section) {
+    // Calculate placeholder
+    let placeholder = "";
+    const firstExample = f.examples?.[0];
+    if (firstExample) {
+      if (f.type === "int") {
+        placeholder = firstExample * (f.scaling || 1);
+      } else {
+        placeholder = firstExample || "";
+      }
+    }
+
     // Generic by type
     if (f.type === "ascii" || f.type === "utf8") {
       const inp = h("input", {
         id: f.id,
         "data-section": section,
         type: "text",
-        placeholder: f.examples?.[0] || "",
+        placeholder,
         required: f.required,
       });
       inp.addEventListener("input", () => {
@@ -356,12 +372,16 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       return inp;
     }
     if (f.type === "rgba") {
+      const initial_value = f.id === "color_1" ? "#FFFFFF" : "#000000";
+      const initial_alpha = f.id === "color_1" ? 255 : 0;
+
       const row = h("div", { class: "row color-input-row" });
       const color = h("input", {
         type: "color",
         id: f.id + "_rgb",
         "data-section": section,
-        value: f.id === "color_1" ? "#FFFFFF" : "#000000",
+        value: initial_value,
+        placeholder: initial_value,
         required: f.required,
       });
       const alpha = h("input", {
@@ -371,7 +391,8 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         min: 0,
         max: 255,
         step: 1,
-        value: f.id === "color_1" ? 255 : 0,
+        value: initial_alpha,
+        placeholder: initial_alpha,
         required: f.required,
       });
       const out = h("input", {
@@ -400,170 +421,34 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       box.append(row, out);
       return box;
     }
-    // XXX Simplify the following code
-    if (f.type === "int" && f.id === "target_diameter") {
-      const mm = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        step: "0.001",
-        placeholder: "1.750 (mm)",
-        required: f.required,
-      });
-      const sync = () => {
-        const um = Math.round(parseFloat(mm.value || "0") * 1000);
-        state.values.set(f.id, um);
-        buildMemory();
-      };
-      mm.addEventListener("input", sync);
-      sync();
-      const hint = h(
-        "div",
-        { class: "help" },
-        "Enter mm. Stored as µm integer (×1000).",
-      );
-      const box = h("div");
-      box.append(mm, hint);
-      return box;
-    }
-    if (
-      f.type === "int" &&
-      [
-        "print_temp",
-        "bed_temp",
-        "mfi_temp",
-        "max_dry_temp",
-        "min_print_temp",
-        "max_print_temp",
-      ].includes(f.id)
-    ) {
-      const c = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        step: 5,
-        placeholder: "210 (°C)",
-        required: f.required,
-      });
-      const scale = f.scaling || 5;
-      const sync = () => {
-        const v = Math.round(parseFloat(c.value || "0") / scale);
-        state.values.set(f.id, v);
-        buildMemory();
-      };
-      c.addEventListener("input", sync);
-      sync();
-      const hint = h(
-        "div",
-        { class: "help" },
-        `Enter °C. Stored as value/\u200B${scale}. Example: 210→${Math.round(210 / scale)}.`,
-      );
-      const box = h("div");
-      box.append(c, hint);
-      return box;
-    }
-    if (f.type === "int" && ["mfi_load", "mfi_value"].includes(f.id)) {
-      const mfi = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        step: "0.1",
-        placeholder: f.id === "mfi_load" ? "2.16 (kg)" : "6.3",
-        required: f.required,
-      });
-      const sync = () => {
-        let val = parseFloat(mfi.value || "0");
-        if (f.id === "mfi_load") val = val * 1000; // kg→g before /10
-        const v = Math.round(val / 10);
-        state.values.set(f.id, v);
-        buildMemory();
-      };
-      mfi.addEventListener("input", sync);
-      sync();
-      const hint = h(
-        "div",
-        { class: "help" },
-        f.id === "mfi_load"
-          ? "Enter kg. Stored as grams/10."
-          : "Enter g/10min. Stored as value×10.",
-      );
-      const box = h("div");
-      box.append(mfi, hint);
-      return box;
-    }
-    if (f.type === "int" && f.id === "density") {
-      const gcm3 = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        step: "0.001",
-        placeholder: "1.240 (g/cm³)",
-        required: f.required,
-      });
-      const sync = () => {
-        const ug = Math.round(parseFloat(gcm3.value || "0") * 1000);
-        state.values.set(f.id, ug);
-        buildMemory();
-      };
-      gcm3.addEventListener("input", sync);
-      sync();
-      const hint = h(
-        "div",
-        { class: "help" },
-        "Enter g/cm³. Stored as µg/cm³ (×1000).",
-      );
-      const box = h("div");
-      box.append(gcm3, hint);
-      return box;
-    }
-    if (f.type === "int" && f.id === "td") {
-      const td = h("input", {
-        id: f.id,
-        "data-section": section,
-        type: "number",
-        min: 0,
-        step: "0.1",
-        placeholder: "11.8",
-        required: f.required,
-      });
-      const sync = () => {
-        const ug = Math.round(parseFloat(td.value || "0") * 10);
-        state.values.set(f.id, ug);
-        buildMemory();
-      };
-      td.addEventListener("input", sync);
-      sync();
-      return td;
-    }
     if (f.type === "int") {
+      const scale = f.scaling || 1;
       const inp = h("input", {
         id: f.id,
         "data-section": section,
         type: "number",
         min: 0,
         max: 255 * length,
-        step: "1",
-        placeholder: f.examples?.[0] * (f.scaling || 1) ?? "",
+        step: scale,
+        placeholder,
         required: f.required,
       });
-      inp.addEventListener("input", () => {
-        state.values.set(
-          f.id,
-          Math.round(parseFloat(inp.value || "0") / (f.scaling || 1)),
-        );
+      const sync = () => {
+        const val = Math.round(parseFloat(inp.value || "0") / scale);
+        state.values.set(f.id, val);
         buildMemory();
-      });
+      };
+      inp.addEventListener("input", sync);
+      sync();
       return inp;
     }
-    if (f.type === "int[4]" && f.id === "mfg_date") {
+    if (f.type === "date") {
+      const ph = new Date().toISOString().split("T")[0];
       const inp = h("input", {
         id: f.id,
         "data-section": section,
         type: "date",
+        placeholder: ph,
         required: f.required,
       });
       const sync = () => {
@@ -574,12 +459,14 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       sync();
       return inp;
     }
-    if (f.type === "int[3]" && f.id === "mfg_time") {
+    if (f.type === "time") {
+      const ph = new Date().toISOString().split("T")[1].split(".")[0];
       const inp = h("input", {
         id: f.id,
         "data-section": section,
         type: "time",
         step: 1,
+        placeholder: ph,
         required: f.required,
       });
       const sync = () => {
@@ -591,12 +478,12 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       return inp;
     }
 
-    // Fallback integer/text
+    // Text fallback
     const inp = h("input", {
       id: f.id,
       "data-section": section,
       type: "text",
-      placeholder: f.examples?.[0] ?? "",
+      placeholder,
       required: f.required,
     });
     inp.addEventListener("input", () => {
@@ -604,17 +491,6 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       buildMemory();
     });
     return inp;
-  }
-
-  // --- Building ---
-  function hasExtendedSet() {
-    const els = document.querySelectorAll("[data-section='extended']");
-    for (const el of els) {
-      if (el.value) {
-        return true;
-      }
-    }
-    return false;
   }
 
   function hexdump(buf, startAddr = 0x00) {
@@ -628,6 +504,17 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       lines.push(`${addrHex(i)}  ${hexs.padEnd(16 * 3 - 1, " ")}  |${ascii}|`);
     }
     return lines.join("\n");
+  }
+
+  // --- Building ---
+  function hasExtendedSet() {
+    const els = document.querySelectorAll("[data-section='extended']");
+    for (const el of els) {
+      if (el.value) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function buildMemory() {
@@ -649,7 +536,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       if (f.type === "ascii" || f.type === "utf8")
         return typeof val === "string" && val.trim().length > 0;
       if (f.type === "rgba") return Array.isArray(val) && val.length === 4;
-      if (f.type === "int" || f.type === "int[3]" || f.type === "int[4]") {
+      if (f.type === "int" || f.type === "date" || f.type === "time") {
         if (val === undefined || val === null) return false;
         const n = typeof val === "number" ? val : Number(val);
         return Number.isFinite(n) && n != 0;
@@ -705,15 +592,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       const addr = parseHex(f.start);
       const val = state.values.get(f.id);
       try {
-        if (f.type === "ascii") {
-          const s = (f.const ?? val ?? "") + "";
-          push(f, addr, encodeAscii(s, f.length));
-        } else if (f.type === "utf8") {
-          push(f, addr, encodeUtf8((val ?? "") + "", f.length));
-        } else if (f.type === "rgba") {
-          const rgba = Array.isArray(val) ? val : [255, 255, 255, 255];
-          push(f, addr, new Uint8Array(rgba.slice(0, 4)));
-        } else if (f.type === "int" && f.id === "tag_version") {
+        if (f.type === "int" && f.id === "tag_version") {
           const num =
             state.values.get("tag_version") ??
             Math.round(parseFloat(SPEC.version || "0") * 1000);
@@ -723,16 +602,18 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
             packInt(num, f.length, be),
             `version ${SPEC.version ?? "—"}`,
           );
-        } else if (f.type === "int" && f.id === "density") {
+        } else if (f.type === "ascii") {
+          const s = (f.const ?? val ?? "") + "";
+          push(f, addr, encodeAscii(s, f.length));
+        } else if (f.type === "utf8") {
+          push(f, addr, encodeUtf8((val ?? "") + "", f.length));
+        } else if (f.type === "rgba") {
+          const rgba = Array.isArray(val) ? val : [255, 255, 255, 255];
+          push(f, addr, new Uint8Array(rgba.slice(0, 4)));
+        } else if (f.type === "int") {
           const n = Number(val || 0);
           push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === "int" && typeof f.scaling === "number") {
-          const n = Number(val || 0);
-          push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === "int" && (f.length === 1 || f.length === 2)) {
-          const n = Number(val || 0);
-          push(f, addr, packInt(n, f.length, be));
-        } else if (f.type === "int[4]" && f.id === "mfg_date") {
+        } else if (f.type === "date") {
           const d = (val || "").split("-");
           let y = 0,
             m = 0,
@@ -748,7 +629,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
             dd & 0xff,
           ]);
           push(f, addr, bytes);
-        } else if (f.type === "int[3]" && f.id === "mfg_time") {
+        } else if (f.type === "time") {
           const t = (val || "00:00:00").split(":");
           let hh = 0,
             mm = 0,
@@ -1072,8 +953,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         if (f.id === "tag_version") {
           const v = readInt(bytes) / 1000.0;
           const ev = parseFloat(SPEC.version);
-          console.log(f, v, ev);
-          if (v / 1000 != ev) {
+          if (v != ev) {
             msg(
               `Warning: loaded tag version is mismatched (got ${v}, expected ${ev})`,
               true,
@@ -1098,54 +978,20 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
           const out = document.getElementById(f.id);
           if (out) out.value = `[${r},${g},${b},${a}]`;
           state.values.set(f.id, [r, g, b, a]);
-        } else if (f.type === "int" && (f.length === 1 || f.length === 2)) {
+        } else if (f.type === "int") {
           const n = readInt(bytes);
 
-          if (
-            [
-              "print_temp",
-              "bed_temp",
-              "mfi_temp",
-              "max_dry_temp",
-              "min_print_temp",
-              "max_print_temp",
-            ].includes(f.id)
-          ) {
-            const scale = f.scaling || 5;
-            const holder = document.getElementById(f.id);
-            const number = holder?.parentElement?.querySelector(
-              'input[type="number"]',
-            );
-            if (number) {
-              number.value = String(n * scale);
-              number.dispatchEvent(new Event("input", { bubbles: true }));
-            } else {
-              state.values.set(f.id, n);
-            }
-          } else if (f.id === "target_diameter") {
-            const mmEl = document
-              .querySelector("#" + f.id)
-              ?.parentElement?.querySelector('input[type="number"]');
-            if (mmEl) {
-              mmEl.value = String((n / 1000).toFixed(3));
-              mmEl.dispatchEvent(new Event("input", { bubbles: true }));
-            } else {
-              state.values.set(f.id, n);
-            }
-          } else if (f.id === "density") {
-            const gcm3El = document
-              .querySelector("#" + f.id)
-              ?.parentElement?.querySelector('input[type="number"]');
-            if (gcm3El) {
-              gcm3El.value = String((n / 1000).toFixed(3));
-              gcm3El.dispatchEvent(new Event("input", { bubbles: true }));
-            } else {
-              state.values.set(f.id, n);
-            }
+          const holder = document.getElementById(f.id);
+          const number = holder?.parentElement?.querySelector(
+            'input[type="number"]',
+          );
+          if (number) {
+            number.value = String(n * (f.scaling || 1));
+            number.dispatchEvent(new Event("input", { bubbles: true }));
           } else {
-            setVal(f.id, String(n));
+            state.values.set(f.id, n);
           }
-        } else if (f.type === "int[4]" && f.id === "mfg_date") {
+        } else if (f.type === "date") {
           const y = (bytes[0] << 8) | bytes[1],
             m = bytes[2],
             d = bytes[3];
@@ -1153,7 +999,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
             f.id,
             `${y.toString().padStart(4, "0")}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`,
           );
-        } else if (f.type === "int[3]" && f.id === "mfg_time") {
+        } else if (f.type === "time") {
           const [hh = 0, mm = 0, ss = 0] = bytes;
           setVal(
             f.id,
@@ -1164,6 +1010,21 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         /* be forgiving on decode */
       }
     }
+  }
+
+  function fillExamples(extended = false) {
+    const inputs = document.querySelectorAll(
+      ".field-row input:not([type=hidden])",
+    );
+    for (const input of inputs) {
+      const section = input.dataset["section"];
+      if (section == "core" || (extended && section == "extended")) {
+        input.value = input.placeholder;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+
+    buildMemory();
   }
 
   // --- Simple built-in tests ---
@@ -1225,31 +1086,13 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       msg("Error: " + message, true);
     };
 
-    document.getElementById("exampleBtn").addEventListener("click", () => {
-      const setIf = (id, v) => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.value = v;
-        el.dispatchEvent(new Event("input", { bubbles: true }));
-      };
-      setIf("manufacturer", "Polar Filament");
-      setIf("material_base", "PLA");
-      setIf("color_name", "Deep Ocean Blue");
-      setIf("color_1_rgb", "#1E90FF");
-      setIf("color_1_a", 255);
-      setIf("color_2_rgb", "#000000");
-      setIf("color_2_a", 0);
-      setIf("color_2_rgb", "#000000");
-      setIf("color_2_a", 0);
-      setIf("print_temp", 210);
-      setIf("bed_temp", 60);
-      setIf("target_diameter", 1.75);
-      setIf("density", 1.24);
-      setIf("target_weight", 1000);
-      setIf("td", 11.8);
+    document
+      .getElementById("exampleBtn")
+      .addEventListener("click", () => fillExamples());
 
-      buildMemory();
-    });
+    document
+      .getElementById("allExampleBtn")
+      .addEventListener("click", () => fillExamples(true));
 
     // File picker
     document

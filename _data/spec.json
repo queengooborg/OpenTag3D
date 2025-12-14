@@ -60,7 +60,7 @@
         "start": "0x2B",
         "length": 32,
         "usage": "display",
-        "examples": ["Blue", "Electric Watermelon"],
+        "examples": ["White", "Blue", "Electric Watermelon"],
         "description": "Color in plain text."
       },
       {
@@ -218,7 +218,7 @@
         "name": "Manufacture Date",
         "id": "mfg_date",
         "unit": "YYYY,MM,DD",
-        "type": "int[4]",
+        "type": "date",
         "start": "0xA0",
         "length": 4,
         "usage": "display",
@@ -229,7 +229,7 @@
         "name": "Manufacture Time",
         "id": "mfg_time",
         "unit": "UTC hh:mm:ss",
-        "type": "int[3]",
+        "type": "time",
         "start": "0xA4",
         "length": 3,
         "usage": "display",
