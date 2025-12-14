@@ -1,5 +1,5 @@
 {
-  "version": "0.012",
+  "version": "0.020",
   "mime_type": "application/opentag3d",
   "core": {
     "address_range": { "start": "0x00", "end": "0x6F" },
@@ -175,6 +175,17 @@
         "examples": [1240, 3900],
         "required": true,
         "description": "Filament density in µg (micrograms) per cubic centimeter. Eg `1240` → `1.240g/cm³`. (Recommendations: 1.24 for PLA, 1.07 for ABS, 1.27 for PETG)"
+      },
+      {
+        "name": "Transmission Distance (TD)",
+        "id": "td",
+        "unit": "µm",
+        "type": "int",
+        "start": "0x64",
+        "length": 2,
+        "usage": "operational",
+        "examples": [2540],
+        "description": "Opaque thickness in µm (micrometers)."
       }
     ]
   },
@@ -316,22 +327,11 @@
         "description": "Length in meters."
       },
       {
-        "name": "Transmission Distance (TD)",
-        "id": "td",
-        "unit": "µm",
-        "type": "int",
-        "start": "0xB2",
-        "length": 2,
-        "usage": "operational",
-        "examples": [2540],
-        "description": "Opaque thickness in µm (micrometers)."
-      },
-      {
         "name": "Max Dry Temp",
         "id": "max_dry_temp",
         "unit": "ºC",
         "type": "int",
-        "start": "0xB4",
+        "start": "0xB2",
         "length": 1,
         "usage": "operational",
         "scaling": 5,
@@ -343,7 +343,7 @@
         "id": "dry_time",
         "unit": "hr",
         "type": "int",
-        "start": "0xB5",
+        "start": "0xB3",
         "length": 1,
         "usage": "operational",
         "examples": [4, 8, 12],
@@ -354,7 +354,7 @@
         "id": "min_print_temp",
         "unit": "ºC",
         "type": "int",
-        "start": "0xB6",
+        "start": "0xB4",
         "length": 1,
         "usage": "operational",
         "scaling": 5,
@@ -366,7 +366,7 @@
         "id": "max_print_temp",
         "unit": "ºC",
         "type": "int",
-        "start": "0xB7",
+        "start": "0xB5",
         "length": 1,
         "usage": "operational",
         "scaling": 5,
@@ -378,7 +378,7 @@
         "id": "min_vso",
         "unit": "mm³/s",
         "type": "int",
-        "start": "0xB8",
+        "start": "0xB6",
         "length": 1,
         "usage": "operational",
         "examples": [20],
@@ -389,7 +389,7 @@
         "id": "max_vso",
         "unit": "mm³/s",
         "type": "int",
-        "start": "0xB9",
+        "start": "0xB7",
         "length": 1,
         "usage": "operational",
         "examples": [120],
@@ -400,7 +400,7 @@
         "id": "target_vso",
         "unit": "mm³/s",
         "type": "int",
-        "start": "0xBA",
+        "start": "0xB8",
         "length": 1,
         "usage": "operational",
         "examples": [80],
