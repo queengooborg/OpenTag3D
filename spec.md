@@ -9,13 +9,6 @@ description: The details of the OpenTag3D specification.
 
 Current Version: {{ site.data.spec.version }}
 
-> [!NOTE]
-> In v0.005 of the standard, all of the tag data was memory mapped in order to maximize space. However, many devices did not like the lack of NDEF records, including the Web NFC writer. For improved convenience and support, v0.010 of the standard now utilizes NDEF records.
->
-> Since the NDEF record headers take up additional space on the tag, the online URL field was moved from Core to Extended. Given that the online URL is for advanced data anyways, this felt like a reasonable compromise.
->
-> Additionally, in v0.005, all unpopulated fields in the Extended data format would have to be populated with a "-1" in binary (or 0xFFFFFFFFFFFFFFFF). To help preserve free space in v0.010, unpopulated fields can now be left as 0x00.
-
 ## Hardware Standard
 
 The OpenTag3D standard is designed to work on any NFC tag that is compliant with the ISO/IEC 14443 Type A communication protocol, is compatible with NDEF Type 2, and has at least 144 bytes of writable capacity. These kinds of tags are plentiful and can be read and written with smartphones and PN532 modules, making them low-cost and easy to integrate.
