@@ -35,3 +35,7 @@ backers:
     url: "https://polarfilament.com"
     backed: "2024-02-25"
     category: "filament"
+  - name: "QRSpool"
+    url: "https://qrspool.com"
+    backed: "2026-04-25"
+    category: "software"
