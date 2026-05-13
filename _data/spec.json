@@ -7,6 +7,7 @@
       {
         "name": "Tag Version",
         "id": "tag_version",
+        "added": "1.000",
         "unit": "version",
         "type": "int",
         "start": "0x00",
@@ -20,6 +21,7 @@
       {
         "name": "Base Material Name",
         "id": "material_base",
+        "added": "1.000",
         "unit": "string",
         "type": "utf8",
         "start": "0x02",
@@ -32,6 +34,7 @@
       {
         "name": "Material Modifiers",
         "id": "material_mod",
+        "added": "1.000",
         "unit": "string",
         "type": "utf8",
         "start": "0x07",
@@ -43,6 +46,7 @@
       {
         "name": "Filament Manufacturer",
         "id": "manufacturer",
+        "added": "1.000",
         "unit": "string",
         "type": "utf8",
         "start": "0x1B",
@@ -55,6 +59,7 @@
       {
         "name": "Color Name",
         "id": "color_name",
+        "added": "1.000",
         "unit": "string",
         "type": "utf8",
         "start": "0x2B",
@@ -66,6 +71,7 @@
       {
         "name": "Color 1 Hex",
         "id": "color_1",
+        "added": "1.000",
         "unit": "RGBA",
         "type": "rgba",
         "start": "0x4B",
@@ -79,6 +85,7 @@
       {
         "name": "Color 2 Hex",
         "id": "color_2",
+        "added": "1.000",
         "unit": "RGBA",
         "type": "rgba",
         "start": "0x50",
@@ -91,6 +98,7 @@
       {
         "name": "Color 3 Hex",
         "id": "color_3",
+        "added": "1.000",
         "unit": "RGBA",
         "type": "rgba",
         "start": "0x54",
@@ -103,6 +111,7 @@
       {
         "name": "Color 4 Hex",
         "id": "color_4",
+        "added": "1.000",
         "unit": "RGBA",
         "type": "rgba",
         "start": "0x58",
@@ -115,6 +124,7 @@
       {
         "name": "Target Diameter",
         "id": "target_diameter",
+        "added": "1.000",
         "unit": "mm",
         "type": "int",
         "start": "0x5C",
@@ -128,6 +138,7 @@
       {
         "name": "Target Weight",
         "id": "target_weight",
+        "added": "1.000",
         "unit": "g",
         "type": "int",
         "start": "0x5E",
@@ -140,6 +151,7 @@
       {
         "name": "Print Temperature",
         "id": "print_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0x60",
@@ -153,6 +165,7 @@
       {
         "name": "Bed Temperature",
         "id": "bed_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0x61",
@@ -166,6 +179,7 @@
       {
         "name": "Density",
         "id": "density",
+        "added": "1.000",
         "unit": "g/cm³",
         "type": "int",
         "start": "0x62",
@@ -179,6 +193,7 @@
       {
         "name": "Transmission Distance (TD)",
         "id": "td",
+        "added": "1.000",
         "unit": "mm",
         "type": "int",
         "start": "0x64",
@@ -196,6 +211,7 @@
       {
         "name": "Online Data URL",
         "id": "online_data_url",
+        "added": "1.000",
         "unit": "string",
         "type": "ascii",
         "start": "0x70",
@@ -207,6 +223,7 @@
       {
         "name": "Serial Number / Batch ID",
         "id": "serial",
+        "added": "1.000",
         "type": "utf8",
         "start": "0x90",
         "length": 16,
@@ -217,6 +234,7 @@
       {
         "name": "Manufacture Date",
         "id": "mfg_date",
+        "added": "1.000",
         "unit": "YYYY,MM,DD",
         "type": "date",
         "start": "0xA0",
@@ -228,6 +246,7 @@
       {
         "name": "Manufacture Time",
         "id": "mfg_time",
+        "added": "1.000",
         "unit": "UTC hh:mm:ss",
         "type": "time",
         "start": "0xA4",
@@ -239,6 +258,7 @@
       {
         "name": "Spool Core Diameter",
         "id": "spool_core_diameter",
+        "added": "1.000",
         "unit": "mm",
         "type": "int",
         "start": "0xA7",
@@ -250,6 +270,7 @@
       {
         "name": "MFI Temp",
         "id": "mfi_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xA8",
@@ -262,6 +283,7 @@
       {
         "name": "MFI Load",
         "id": "mfi_load",
+        "added": "1.000",
         "unit": "g",
         "type": "int",
         "start": "0xA9",
@@ -274,6 +296,7 @@
       {
         "name": "MFI Value",
         "id": "mfi_value",
+        "added": "1.000",
         "unit": "g/10min",
         "type": "int",
         "start": "0xAA",
@@ -286,6 +309,7 @@
       {
         "name": "Measured Tolerance",
         "id": "measured_tolerance",
+        "added": "1.000",
         "unit": "µm",
         "type": "int",
         "start": "0xAB",
@@ -297,6 +321,7 @@
       {
         "name": "Empty Spool Weight",
         "id": "empty_spool_weight",
+        "added": "1.000",
         "unit": "g",
         "type": "int",
         "start": "0xAC",
@@ -308,6 +333,7 @@
       {
         "name": "Measured Filament Weight",
         "id": "measured_filament_weight",
+        "added": "1.000",
         "unit": "g",
         "type": "int",
         "start": "0xAE",
@@ -319,6 +345,7 @@
       {
         "name": "Measured Filament Length",
         "id": "measured_filament_length",
+        "added": "1.000",
         "unit": "m",
         "type": "int",
         "start": "0xB0",
@@ -330,6 +357,7 @@
       {
         "name": "Max Dry Temp",
         "id": "max_dry_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xB2",
@@ -342,6 +370,7 @@
       {
         "name": "Dry Time",
         "id": "dry_time",
+        "added": "1.000",
         "unit": "hr",
         "type": "int",
         "start": "0xB3",
@@ -353,6 +382,7 @@
       {
         "name": "Min Print Temp",
         "id": "min_print_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xB4",
@@ -365,6 +395,7 @@
       {
         "name": "Max Print Temp",
         "id": "max_print_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xB5",
@@ -377,6 +408,7 @@
       {
         "name": "Min Bed Temp",
         "id": "min_bed_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xB6",
@@ -389,6 +421,7 @@
       {
         "name": "Max Bed Temp",
         "id": "max_bed_temp",
+        "added": "1.000",
         "unit": "ºC",
         "type": "int",
         "start": "0xB7",
@@ -401,6 +434,7 @@
       {
         "name": "Min Volumetric Speed",
         "id": "min_vso",
+        "added": "1.000",
         "unit": "mm³/s",
         "type": "int",
         "start": "0xB8",
@@ -412,6 +446,7 @@
       {
         "name": "Max Volumetric Speed",
         "id": "max_vso",
+        "added": "1.000",
         "unit": "mm³/s",
         "type": "int",
         "start": "0xB9",
@@ -423,6 +458,7 @@
       {
         "name": "Target Volumetric Speed",
         "id": "target_vso",
+        "added": "1.000",
         "unit": "mm³/s",
         "type": "int",
         "start": "0xBA",
