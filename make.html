@@ -358,6 +358,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
         type: "text",
         placeholder,
         required: f.required,
+        maxlength: f.length,
       });
       inp.addEventListener("input", () => {
         state.values.set(f.id, inp.value);
@@ -479,6 +480,7 @@ description: A tool to make the RFID tag data for an OpenTag3D tag.
       type: "text",
       placeholder,
       required: f.required,
+      maxlength: f.length,
     });
     inp.addEventListener("input", () => {
       state.values.set(f.id, inp.value);
