@@ -33,7 +33,7 @@ These are companies that are implementing OpenTag3D into their printers, filamen
 
 {%- assign cats = site.data.backers.categories -%}
 {%- assign all = site.data.backers.backers -%}
-{%- assign category_order = "filament,hardware" | split: "," -%}
+{%- assign category_order = "filament,hardware,software" | split: "," -%}
 
 <ul>
 {%- for cat in category_order -%}
