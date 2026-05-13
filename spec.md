@@ -58,6 +58,9 @@ Temperatures are stored in Celsius, divided by 5.
 
 Below is list of data that will live on the RFID chip. All **REQUIRED** data must be populated to be compliant with the spec.
 
+> [!NOTE]
+> Spec implementers: the memory maps for OpenTag3D Core and Extended are also available in [JSON format](https://opentag3d.info/spec.json).
+
 ### Memory Map - OpenTag3D Core
 
 This is designed to fit within the 144 bytes of writable space on the NTAG213, the smallest and cheapest variant of compatible tags.
